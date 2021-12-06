@@ -33,7 +33,7 @@ nox.options.sessions = (
     "xdoctest",
     "docs-build",
 )
-mypy_type_packages = ('types-croniter', 'types-pytz')
+mypy_type_packages = ("types-croniter", "types-pytz")
 
 
 def activate_virtualenv_in_precommit_hooks(session: Session) -> None:

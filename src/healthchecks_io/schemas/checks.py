@@ -2,14 +2,21 @@
 Schemas for checks
 https://healthchecks.io/docs/api/
 """
-from pydantic import BaseModel, validator, Field
 from datetime import datetime
-from typing import Optional, List, Dict, Any, Union
-from pydantic import AnyUrl
-from croniter import croniter
-import pytz
-from urllib.parse import urlparse
 from pathlib import PurePath
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
+from urllib.parse import urlparse
+
+import pytz
+from croniter import croniter
+from pydantic import AnyUrl
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic import validator
 
 
 class Check(BaseModel):
@@ -33,65 +40,100 @@ class Check(BaseModel):
     timeout: int
     uuid: Optional[str]
 
-    @validator('uuid', always=True)
-    def validate_uuid(cls, value: Optional[str], values: Dict[str, Any]) -> Optional[str]:
+    @validator("uuid", always=True)
+    def validate_uuid(
+        cls, value: Optional[str], values: Dict[str, Any]
+    ) -> Optional[str]:
         """
-        Tries to set the uuid from the ping_url. 
+        Tries to set the uuid from the ping_url.
 
         Will return none if a read only token is used because it cannot retrieve the UUID of a check
         """
-        if value is None and values.get('ping_url', None) is not None:
+        if value is None and values.get("ping_url", None) is not None:
             # url is like healthchecks.io/ping/8f57b84b-86c2-4546-8923-03f83d27604a, so we want just the UUID off the end
             # Parse the url, grab the path and then just get the name using pathlib
-            path = PurePath(str(urlparse(values.get('ping_url')).path))
+            path = PurePath(str(urlparse(values.get("ping_url")).path))
             return path.name
         return value
 
     @classmethod
-    def from_api_result(cls, check_dict: Dict[str, Any]) -> 'Check':
+    def from_api_result(cls, check_dict: Dict[str, Any]) -> "Check":
         """
-        Converts a dict result from the healthchecks API into a Check object 
+        Converts a dict result from the healthchecks API into a Check object
         """
         return cls(**check_dict)
 
 
-
 class CheckCreate(BaseModel):
     name: Optional[str] = Field(..., description="Name of the check")
-    tags: Optional[str] = Field(..., description="String separated list of tags to apply")
+    tags: Optional[str] = Field(
+        ..., description="String separated list of tags to apply"
+    )
     desc: Optional[str] = Field(..., description="Description of the check")
-    timeout: Optional[int] = Field(86400, description="The expected period of this check in seconds." , gte=60, lte=31536000)
-    grace: Optional[int] = Field(3600, description="The grace period for this check in seconds.", gte=60, lte=31536000)
-    schedule: Optional[str] = Field("* * * * *", description="A cron expression defining this check's schedule. If you specify both timeout and schedule parameters, Healthchecks.io will create a Cron check and ignore the timeout value.")
-    tz: Optional[str] = Field("UTC", description="Server's timezone. This setting only has an effect in combination with the schedule parameter.")
-    manual_resume: Optional[bool] = Field(False, description="Controls whether a paused check automatically resumes when pinged (the default) or not. If set to false, a paused check will leave the paused state when it receives a ping. If set to true, a paused check will ignore pings and stay paused until you manually resume it from the web dashboard.")
-    methods: Optional[str] = Field("", description="Specifies the allowed HTTP methods for making ping requests. Must be one of the two values: an empty string or POST. Set this field to an empty string to allow HEAD, GET, and POST requests. Set this field to POST to allow only POST requests.")
-    channels: Optional[str] = Field(None, description="By default, this API call assigns no integrations to the newly created check. By default, this API call assigns no integrations to the newly created check. To assign specific integrations, use a comma-separated list of integration UUIDs.")
-    unique: Optional[List[Optional[str]]] = Field([], description="Enables upsert functionality. Before creating a check, Healthchecks.io looks for existing checks, filtered by fields listed in unique. If Healthchecks.io does not find a matching check, it creates a new check and returns it with the HTTP status code 201 If Healthchecks.io finds a matching check, it updates the existing check and returns it with HTTP status code 200. The accepted values for the unique field are name, tags, timeout, and grace.")
+    timeout: Optional[int] = Field(
+        86400,
+        description="The expected period of this check in seconds.",
+        gte=60,
+        lte=31536000,
+    )
+    grace: Optional[int] = Field(
+        3600,
+        description="The grace period for this check in seconds.",
+        gte=60,
+        lte=31536000,
+    )
+    schedule: Optional[str] = Field(
+        "* * * * *",
+        description="A cron expression defining this check's schedule. If you specify both timeout and schedule parameters, Healthchecks.io will create a Cron check and ignore the timeout value.",
+    )
+    tz: Optional[str] = Field(
+        "UTC",
+        description="Server's timezone. This setting only has an effect in combination with the schedule parameter.",
+    )
+    manual_resume: Optional[bool] = Field(
+        False,
+        description="Controls whether a paused check automatically resumes when pinged (the default) or not. If set to false, a paused check will leave the paused state when it receives a ping. If set to true, a paused check will ignore pings and stay paused until you manually resume it from the web dashboard.",
+    )
+    methods: Optional[str] = Field(
+        "",
+        description="Specifies the allowed HTTP methods for making ping requests. Must be one of the two values: an empty string or POST. Set this field to an empty string to allow HEAD, GET, and POST requests. Set this field to POST to allow only POST requests.",
+    )
+    channels: Optional[str] = Field(
+        None,
+        description="By default, this API call assigns no integrations to the newly created check. By default, this API call assigns no integrations to the newly created check. To assign specific integrations, use a comma-separated list of integration UUIDs.",
+    )
+    unique: Optional[List[Optional[str]]] = Field(
+        [],
+        description="Enables upsert functionality. Before creating a check, Healthchecks.io looks for existing checks, filtered by fields listed in unique. If Healthchecks.io does not find a matching check, it creates a new check and returns it with the HTTP status code 201 If Healthchecks.io finds a matching check, it updates the existing check and returns it with HTTP status code 200. The accepted values for the unique field are name, tags, timeout, and grace.",
+    )
 
-    @validator('schedule')
+    @validator("schedule")
     def validate_schedule(cls, value: str) -> str:
         if not croniter.is_valid(value):
             raise ValueError("Schedule is not a valid cron expression")
         return value
 
-    @validator('tz')
+    @validator("tz")
     def validate_tz(cls, value: str) -> str:
         if not value in pytz.all_timezones:
             raise ValueError("Tz is not a valid timezone")
         return value
-    
-    @validator('methods')
+
+    @validator("methods")
     def validate_methods(cls, value: str) -> str:
         if value not in ("", "POST"):
-            raise ValueError("Methods is invalid, it should be either an empty string or POST")
+            raise ValueError(
+                "Methods is invalid, it should be either an empty string or POST"
+            )
         return value
 
-    @validator('unique')
+    @validator("unique")
     def validate_unique(cls, value: List[Optional[str]]) -> List[Optional[str]]:
         for unique in value:
-            if unique not in ('name', 'tags', 'timeout', 'grace'):
-                raise ValueError("Unique is not valid. Unique can only be name, tags, timeout, and grace or an empty list")
+            if unique not in ("name", "tags", "timeout", "grace"):
+                raise ValueError(
+                    "Unique is not valid. Unique can only be name, tags, timeout, and grace or an empty list"
+                )
         return value
 
 
@@ -106,9 +148,11 @@ class CheckPings(BaseModel):
     duration: float
 
     @classmethod
-    def from_api_result(cls, ping_dict: Dict[str, Union[str, int, datetime]]) -> 'CheckPings':
-        ping_dict['number_of_pings'] = ping_dict['n']
-        ping_dict['user_agent'] = ping_dict['ua']
+    def from_api_result(
+        cls, ping_dict: Dict[str, Union[str, int, datetime]]
+    ) -> "CheckPings":
+        ping_dict["number_of_pings"] = ping_dict["n"]
+        ping_dict["user_agent"] = ping_dict["ua"]
         return cls(**ping_dict)
 
 

@@ -1,8 +1,11 @@
-import pytest
 from datetime import datetime
-from typing import Dict, Union
+from typing import Dict
+from typing import Union
+
+import pytest
 
 from healthchecks_io.schemas import checks
+
 
 @pytest.fixture
 def fake_check_api_result() -> Dict[str, Union[str, int]]:
@@ -22,8 +25,9 @@ def fake_check_api_result() -> Dict[str, Union[str, int]]:
         "update_url": "testhc.io/api/v1/checks/8f57a84b-86c2-4246-8923-02f83d17604a",
         "pause_url": "testhc.io/api/v1/checks/8f57a84b-86c2-4246-8923-02f83d17604a/pause",
         "channels": "*",
-        "timeout": 259200
-        }
+        "timeout": 259200,
+    }
+
 
 @pytest.fixture
 def fake_check_ro_api_result() -> Dict[str, Union[str, int]]:
@@ -40,8 +44,9 @@ def fake_check_ro_api_result() -> Dict[str, Union[str, int]]:
         "manual_resume": False,
         "methods": "",
         "unique_key": "a6c7b0a8a66bed0df66abfdab3c77736861703ee",
-        "timeout": 3600
-        }
+        "timeout": 3600,
+    }
+
 
 @pytest.fixture
 def fake_check() -> checks.Check:
@@ -61,8 +66,9 @@ def fake_check() -> checks.Check:
         pause_url="testurl.com/api/v1/checks/test-uuid/pause",
         channel="*",
         timeout=86400,
-        uuid="test-uuid"
+        uuid="test-uuid",
     )
+
 
 @pytest.fixture
 def fake_ro_check(fake_check: checks.Check):
