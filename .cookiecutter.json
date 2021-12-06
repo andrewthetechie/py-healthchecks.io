@@ -1,0 +1,12 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Andrew Herrington",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "andrew@\ud83d\udcbb.kz",
+  "friendly_name": "Py Healthchecks.Io",
+  "github_user": "andrewthetechie",
+  "license": "MIT",
+  "package_name": "healthchecks_io",
+  "project_name": "py-healthchecks.io",
+  "version": "0.0.0"
+}
