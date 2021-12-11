@@ -173,7 +173,7 @@ class CheckPings(BaseModel):
     remote_addr: str
     method: str
     user_agent: str
-    duration: float
+    duration: Optional[float] = None
 
     @classmethod
     def from_api_result(

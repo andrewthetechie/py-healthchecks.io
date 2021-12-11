@@ -15,7 +15,7 @@ from weakref import finalize
 from httpx import Client, Response
 
 from healthchecks_io.schemas import checks
-from .exceptions import HCAPIAuthError, HCAPIError, CheckNotFoundError
+from .exceptions import HCAPIAuthError, HCAPIError, CheckNotFoundError, BadAPIRequestError
 
 
 class AbstractClient(ABC):
@@ -90,6 +90,7 @@ class AbstractClient(ABC):
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
 
         Returns:
             Response: the passed in response object
@@ -103,6 +104,12 @@ class AbstractClient(ABC):
                 f"Status Code {response.status_code}. Response {response.text}"
             )
         
+        if response.status_code == 404:
+            raise CheckNotFoundError(f"CHeck not found at {response.request.url}")
+        
+        if response.status_code == 400:
+            raise BadAPIRequestError(f"Bad request when requesting {response.request.url}. {response.text}")
+
         return response
 
     @staticmethod

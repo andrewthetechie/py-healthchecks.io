@@ -6,8 +6,6 @@ from typing import Optional
 from httpx import AsyncClient as HTTPXAsyncClient
 
 from ._abstract import AbstractClient
-from .exceptions import HCAPIAuthError, CheckNotFoundError
-from .exceptions import HCAPIError
 from healthchecks_io import VERSION
 from healthchecks_io.schemas import checks
 
@@ -89,11 +87,119 @@ class AsyncClient(AbstractClient):
             checks.Check: the check
 
         Raises:
-            CheckNotFoundError: when no check with check_id is found
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
+
         """
         request_url = self._get_api_request_url(f"checks/{check_id}")
         response = self.check_response(await self._client.get(request_url))
-        if response.status_code == 404:
-            raise CheckNotFoundError(f"{check_id} not found at {request_url}")
         return checks.Check.from_api_result(response.json())
 
+    async def pause_check(self, check_id: str) -> checks.Check:
+        """Disables monitoring for a check without removing it. 
+        
+        The check goes into a "paused" state. 
+        You can resume monitoring of the check by pinging it.
+
+        check_id must be a uuid, not a unique id
+
+        Args:
+            check_id (str): check's uuid
+
+        Returns:
+            checks.Check: the check just paused
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
+
+        """
+        request_url = self._get_api_request_url(f"checks/{check_id}/pause")
+        response = self.check_response(await self._client.post(request_url , data={}))
+        return checks.Check.from_api_result(response.json())
+
+    async def delete_check(self, check_id: str) -> checks.Check:
+        """Permanently deletes the check from the user's account. 
+
+        check_id must be a uuid, not a unique id
+
+        Args:
+            check_id (str): check's uuid
+
+        Returns:
+            checks.Check: the check just deleted
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
+
+        """
+        request_url = self._get_api_request_url(f"checks/{check_id}")
+        response = self.check_response(await self._client.delete(request_url))
+        return checks.Check.from_api_result(response.json())
+
+    async def get_check_pings(self, check_id: str) -> List[checks.CheckPings]:
+        """Returns a list of pings this check has received.
+        
+        This endpoint returns pings in reverse order (most recent first), 
+        and the total number of returned pings depends on the account's 
+        billing plan: 100 for free accounts, 1000 for paid accounts.
+
+        Args:
+            check_id (str): check's uuid
+
+        Returns:
+            List[checks.CheckPings]: list of pings this check has received
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
+
+        """
+        request_url = self._get_api_request_url(f"checks/{check_id}/pings/")
+        response = self.check_response(await self._client.get(request_url))
+        return [
+            checks.CheckPings.from_api_result(check_data)
+            for check_data in response.json()["pings"]
+        ]
+
+    async def get_check_flips(self, check_id: str, seconds: Optional[int] = None, start: Optional[int] = None, end: Optional[int] = None) -> List[checks.CheckStatuses]:
+        """
+        Returns a list of "flips" this check has experienced. 
+        
+        A flip is a change of status (from "down" to "up," or from "up" to "down").
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404
+            BadAPIRequestError: Raised when status_code is 400
+
+        Args:
+            check_id (str): check uuid
+            seconds (Optional[int], optional): Returns the flips from the last value seconds. Defaults to None.
+            start (Optional[int], optional): Returns flips that are newer than the specified UNIX timestamp.. Defaults to None.
+            end (Optional[int], optional): Returns flips that are older than the specified UNIX timestamp.. Defaults to None.
+
+        Returns:
+            List[checks.CheckStatuses]: List of status flips for this check
+        
+        """
+        params = dict()
+        if seconds is not None and seconds >=0:
+            params['seconds'] = seconds
+        if start is not None and start >= 0:
+            params['start'] = start
+        if end is not None and end >= 0:
+            params['end'] = end
+
+        request_url = self._get_api_request_url(f"checks/{check_id}/flips/", params)
+        response = self.check_response(await self._client.get(request_url))
+        return [
+            checks.CheckStatuses(**status_data)
+            for status_data in response.json()
+        ]
