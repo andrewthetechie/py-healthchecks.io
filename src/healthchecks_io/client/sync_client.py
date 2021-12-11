@@ -18,29 +18,26 @@ class Client(AbstractClient):
     def __init__(
         self,
         api_key: str,
-        api_url: Optional[str] = "https://healthchecks.io/api/",
-        api_version: Optional[int] = 1,
+        api_url: str = "https://healthchecks.io/api/",
+        api_version: int = 1,
         client: Optional[HTTPXClient] = None,
     ) -> None:
         """An AsyncClient can be used in code using asyncio to work with the Healthchecks.io api.
 
         Args:
             api_key (str): Healthchecks.io API key
-            api_url (Optional[str], optional): API URL. Defaults to "https://healthchecks.io/api/".
-            api_version (Optional[int], optional): Versiopn of the api to use. Defaults to 1.
+            api_url (str): API URL. Defaults to "https://healthchecks.io/api/".
+            api_version (int): Versiopn of the api to use. Defaults to 1.
             client (Optional[HTTPXClient], optional): A httpx.Client. If not
                 passed in, one will be created for this object. Defaults to None.
         """
-        if client is None:
-            client = HTTPXClient()
-        super().__init__(
-            api_key=api_key, api_url=api_url, api_version=api_version, client=client
-        )
+        self._client: HTTPXClient = HTTPXClient() if client is None else client
+        super().__init__(api_key=api_key, api_url=api_url, api_version=api_version)
         self._client.headers["X-Api-Key"] = self._api_key
         self._client.headers["user-agent"] = f"py-healthchecks.io/{VERSION}"
         self._client.headers["Content-type"] = "application/json"
 
-    def _finalizer_method(self):
+    def _finalizer_method(self) -> None:
         """Closes the httpx client."""
         self._client.close()
 

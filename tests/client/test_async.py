@@ -14,7 +14,7 @@ from healthchecks_io.client.exceptions import HCAPIError
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_checks_200(fake_check_api_result, respx_mock, test_async_client):
+async def test_aget_checks_200(fake_check_api_result, respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/")
     respx_mock.get(checks_url).mock(
@@ -27,7 +27,7 @@ async def test_get_checks_200(fake_check_api_result, respx_mock, test_async_clie
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_checks_pass_in_client(fake_check_api_result, respx_mock):
+async def test_aget_checks_pass_in_client(fake_check_api_result, respx_mock):
     httpx_client = HTTPXAsyncClient()
     test_async_client = AsyncClient(
         api_key="test", api_url="http://localhost/api/", client=httpx_client
@@ -43,7 +43,7 @@ async def test_get_checks_pass_in_client(fake_check_api_result, respx_mock):
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_checks_exceptions(
+async def test_aget_checks_exceptions(
     fake_check_api_result, respx_mock, test_async_client
 ):
     checks_url = urljoin(test_async_client._api_url, "checks/")
@@ -59,7 +59,7 @@ async def test_get_checks_exceptions(
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_checks_tags(fake_check_api_result, respx_mock, test_async_client):
+async def test_aget_checks_tags(fake_check_api_result, respx_mock, test_async_client):
     """Test get_checks with tags"""
     checks_url = urljoin(test_async_client._api_url, "checks/")
     respx_mock.get(f"{checks_url}?tag=test&tag=test2").mock(
@@ -80,7 +80,7 @@ def test_finalizer_closes(test_async_client):
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_200(fake_check_api_result, respx_mock, test_async_client):
+async def test_aget_check_200(fake_check_api_result, respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
     respx_mock.get(checks_url).mock(
@@ -92,7 +92,7 @@ async def test_get_check_200(fake_check_api_result, respx_mock, test_async_clien
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_check_get_404(respx_mock, test_async_client):
+async def test_acheck_get_404(respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
     respx_mock.get(checks_url).mock(return_value=Response(status_code=404))
@@ -113,7 +113,7 @@ async def test_pause_check_200(fake_check_api_result, respx_mock, test_async_cli
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_check_pause_404(respx_mock, test_async_client):
+async def test_acheck_pause_404(respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/pause")
     respx_mock.post(checks_url).mock(return_value=Response(status_code=404))
@@ -123,7 +123,7 @@ async def test_check_pause_404(respx_mock, test_async_client):
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_delete_check_200(fake_check_api_result, respx_mock, test_async_client):
+async def test_adelete_check_200(fake_check_api_result, respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
     respx_mock.delete(checks_url).mock(
@@ -135,7 +135,7 @@ async def test_delete_check_200(fake_check_api_result, respx_mock, test_async_cl
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_delete_pause404(respx_mock, test_async_client):
+async def test_adelete_pause404(respx_mock, test_async_client):
     checks_url = urljoin(test_async_client._api_url, "checks/test")
     respx_mock.delete(checks_url).mock(return_value=Response(status_code=404))
     with pytest.raises(CheckNotFoundError):
@@ -144,7 +144,7 @@ async def test_delete_pause404(respx_mock, test_async_client):
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_pings_200(
+async def test_aget_check_pings_200(
     fake_check_pings_api_result, respx_mock, test_async_client
 ):
     checks_url = urljoin(test_async_client._api_url, "checks/test/pings/")
@@ -160,7 +160,7 @@ async def test_get_check_pings_200(
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_flips_200(
+async def test_aget_check_flips_200(
     fake_check_flips_api_result, respx_mock, test_async_client
 ):
     checks_url = urljoin(test_async_client._api_url, "checks/test/flips/")
@@ -190,7 +190,7 @@ async def test_get_check_flips_params_200(
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_flips_400(
+async def test_aget_check_flips_400(
     fake_check_flips_api_result, respx_mock, test_async_client
 ):
     flips_url = urljoin(test_async_client._api_url, "checks/test/flips/")
@@ -201,7 +201,7 @@ async def test_get_check_flips_400(
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_integrations(
+async def test_aget_integrations(
     fake_integrations_api_result, respx_mock, test_async_client
 ):
     channels_url = urljoin(test_async_client._api_url, "channels/")
@@ -215,7 +215,7 @@ async def test_get_integrations(
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_badges(fake_badges_api_result, respx_mock, test_async_client):
+async def test_aget_badges(fake_badges_api_result, respx_mock, test_async_client):
     channels_url = urljoin(test_async_client._api_url, "badges/")
     respx_mock.get(channels_url).mock(
         return_value=Response(status_code=200, json=fake_badges_api_result)

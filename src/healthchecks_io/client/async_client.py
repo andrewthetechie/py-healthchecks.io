@@ -19,33 +19,32 @@ class AsyncClient(AbstractClient):
     def __init__(
         self,
         api_key: str,
-        api_url: Optional[str] = "https://healthchecks.io/api/",
-        api_version: Optional[int] = 1,
+        api_url: str = "https://healthchecks.io/api/",
+        api_version: int = 1,
         client: Optional[HTTPXAsyncClient] = None,
     ) -> None:
         """An AsyncClient can be used in code using asyncio to work with the Healthchecks.io api.
 
         Args:
             api_key (str): Healthchecks.io API key
-            api_url (Optional[str], optional): API URL. Defaults to "https://healthchecks.io/api/".
-            api_version (Optional[int], optional): Versiopn of the api to use. Defaults to 1.
+            api_url (str): API URL. Defaults to "https://healthchecks.io/api/".
+            api_version (int): Versiopn of the api to use. Defaults to 1.
             client (Optional[HTTPXAsyncClient], optional): A httpx.Asyncclient. If not
                 passed in, one will be created for this object. Defaults to None.
         """
-        if client is None:
-            client = HTTPXAsyncClient()
-        super().__init__(
-            api_key=api_key, api_url=api_url, api_version=api_version, client=client
+        self._client: HTTPXAsyncClient = (
+            HTTPXAsyncClient() if client is None else client
         )
+        super().__init__(api_key=api_key, api_url=api_url, api_version=api_version)
         self._client.headers["X-Api-Key"] = self._api_key
         self._client.headers["user-agent"] = f"py-healthchecks.io-async/{VERSION}"
         self._client.headers["Content-type"] = "application/json"
 
-    def _finalizer_method(self):
+    def _finalizer_method(self) -> None:
         """Calls _afinalizer_method from a sync context to work with weakref.finalizer."""
         asyncio.run(self._afinalizer_method())
 
-    async def _afinalizer_method(self):
+    async def _afinalizer_method(self) -> None:
         """Finalizer coroutine that closes our client connections."""
         await self._client.aclose()
 
@@ -250,7 +249,8 @@ class AsyncClient(AbstractClient):
             Dict[str, badges.Badges]: Dictionary of all tags in the project with badges
         """
         request_url = self._get_api_request_url("badges/")
-        response = self.check_response(await self._client.get(request_url))
+        url = await self._client.get(request_url)
+        response = self.check_response(url)
         return {
             key: badges.Badges.from_api_result(item)
             for key, item in response.json()["badges"].items()
