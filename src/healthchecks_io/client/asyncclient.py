@@ -6,7 +6,7 @@ from typing import Optional
 from httpx import AsyncClient as HTTPXAsyncClient
 
 from ._abstract import AbstractClient
-from .exceptions import HCAPIAuthError
+from .exceptions import HCAPIAuthError, CheckNotFoundError
 from .exceptions import HCAPIError
 from healthchecks_io import VERSION
 from healthchecks_io.schemas import checks
@@ -69,18 +69,31 @@ class AsyncClient(AbstractClient):
                     request_url, {"tag": tag}, replace=False
                 )
 
-        response = await self._client.get(request_url)
-
-        if response.status_code == 401:
-            raise HCAPIAuthError("Auth failure when getting checks")
-
-        if response.status_code != 200:
-            raise HCAPIError(
-                f"Error when reaching out to HC API at {request_url}. "
-                f"Status Code {response.status_code}. Response {response.text}"
-            )
+        response = self.check_response(await self._client.get(request_url))
 
         return [
             checks.Check.from_api_result(check_data)
             for check_data in response.json()["checks"]
         ]
+    
+    async def get_check(self, check_id: str) -> checks.Check:
+        """Get a single check by id. 
+
+        check_id can either be a check uuid if using a read/write api key
+        or a unique key if using a read only api key.
+
+        Args:
+            check_id (str): check's uuid or unique id
+
+        Returns:
+            checks.Check: the check
+
+        Raises:
+            CheckNotFoundError: when no check with check_id is found
+        """
+        request_url = self._get_api_request_url(f"checks/{check_id}")
+        response = self.check_response(await self._client.get(request_url))
+        if response.status_code == 404:
+            raise CheckNotFoundError(f"{check_id} not found at {request_url}")
+        return checks.Check.from_api_result(response.json())
+

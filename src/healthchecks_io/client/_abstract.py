@@ -12,9 +12,10 @@ from urllib.parse import urljoin
 from urllib.parse import urlparse
 from weakref import finalize
 
-from httpx import Client
+from httpx import Client, Response
 
 from healthchecks_io.schemas import checks
+from .exceptions import HCAPIAuthError, HCAPIError, CheckNotFoundError
 
 
 class AbstractClient(ABC):
@@ -78,6 +79,31 @@ class AbstractClient(ABC):
             bool: is the client closed
         """
         return self._client.is_closed
+
+    @staticmethod
+    def check_response(response: Response) -> Response:
+        """Checks a healthchecks.io response.
+
+        Args:
+            response (Response): a response from the healthchecks.io api
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+
+        Returns:
+            Response: the passed in response object
+        """
+        if response.status_code == 401 or response.status_code == 403:
+            raise HCAPIAuthError("Auth failure when getting checks")
+
+        if str(response.status_code).startswith("5"):
+            raise HCAPIError(
+                f"Error when reaching out to HC API at {response.request.url}. "
+                f"Status Code {response.status_code}. Response {response.text}"
+            )
+        
+        return response
 
     @staticmethod
     def _add_url_params(url: str, params: Dict[str, str], replace: bool = True):

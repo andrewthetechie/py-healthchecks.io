@@ -74,3 +74,15 @@ def test_finalizer_closes(test_async_client):
     assert not test_async_client.is_closed
     test_async_client._finalizer_method()
     assert test_async_client.is_closed
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
+async def test_get_check_200(fake_check_api_result, respx_mock, test_async_client):
+    assert test_async_client._client is not None
+    checks_url = urljoin(test_async_client._api_url, "checks/test")
+    respx_mock.get(checks_url).mock(
+        return_value=Response(status_code=200, json=fake_check_api_result)
+    )
+    check = await test_async_client.get_check(check_id="test")
+    assert check.name == fake_check_api_result["name"]
