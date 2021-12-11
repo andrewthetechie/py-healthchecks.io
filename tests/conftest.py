@@ -84,13 +84,12 @@ def fake_ro_check(fake_check: checks.Check):
 @pytest.fixture
 def test_async_client():
     """An AsyncClient for testing, set to a nonsense url so we aren't pinging healtchecks."""
-
     yield AsyncClient(api_key="test", api_url="https://localhost/api")
 
 
 @pytest.fixture
 def fake_check_pings_api_result():
-    return [
+    yield [
         {
             "type": "success",
             "date": "2020-06-09T14:51:06.113073+00:00",
@@ -134,8 +133,66 @@ def fake_check_pings_api_result():
 
 @pytest.fixture
 def fake_check_flips_api_result():
-    return [
+    yield [
         {"timestamp": "2020-03-23T10:18:23+00:00", "up": 1},
         {"timestamp": "2020-03-23T10:17:15+00:00", "up": 0},
         {"timestamp": "2020-03-23T10:16:18+00:00", "up": 1},
     ]
+
+
+@pytest.fixture
+def fake_integrations_api_result():
+    yield {
+        "channels": [
+            {
+                "id": "4ec5a071-2d08-4baa-898a-eb4eb3cd6941",
+                "name": "My Work Email",
+                "kind": "email",
+            },
+            {
+                "id": "746a083e-f542-4554-be1a-707ce16d3acc",
+                "name": "My Phone",
+                "kind": "sms",
+            },
+        ]
+    }
+
+
+@pytest.fixture
+def fake_badges_api_result():
+    yield {
+        "badges": {
+            "backup": {
+                "svg": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M-2/backup.svg",
+                "svg3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M/backup.svg",
+                "json": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M-2/backup.json",
+                "json3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M/backup.json",
+                "shields": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M-2/backup.shields",
+                "shields3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/LOegDs5M/backup.shields",
+            },
+            "db": {
+                "svg": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm-2/db.svg",
+                "svg3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm/db.svg",
+                "json": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm-2/db.json",
+                "json3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm/db.json",
+                "shields": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm-2/db.shields",
+                "shields3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/99MuQaKm/db.shields",
+            },
+            "prod": {
+                "svg": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8-2/prod.svg",
+                "svg3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8/prod.svg",
+                "json": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8-2/prod.json",
+                "json3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8/prod.json",
+                "shields": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8-2/prod.shields",
+                "shields3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/1TEhqie8/prod.shields",
+            },
+            "*": {
+                "svg": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe-2.svg",
+                "svg3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe.svg",
+                "json": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe-2.json",
+                "json3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe.json",
+                "shields": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe-2.shields",
+                "shields3": "https://healthchecks.io/badge/67541b37-8b9c-4d17-b952-690eae/9X7kcZoe.shields",
+            },
+        }
+    }

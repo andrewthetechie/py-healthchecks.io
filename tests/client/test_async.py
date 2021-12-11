@@ -103,7 +103,6 @@ async def test_check_get_404(respx_mock, test_async_client):
 @pytest.mark.asyncio
 @pytest.mark.respx
 async def test_pause_check_200(fake_check_api_result, respx_mock, test_async_client):
-    assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/pause")
     respx_mock.post(checks_url).mock(
         return_value=Response(status_code=200, json=fake_check_api_result)
@@ -137,7 +136,6 @@ async def test_delete_check_200(fake_check_api_result, respx_mock, test_async_cl
 @pytest.mark.asyncio
 @pytest.mark.respx
 async def test_delete_pause404(respx_mock, test_async_client):
-    assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
     respx_mock.delete(checks_url).mock(return_value=Response(status_code=404))
     with pytest.raises(CheckNotFoundError):
@@ -149,7 +147,6 @@ async def test_delete_pause404(respx_mock, test_async_client):
 async def test_get_check_pings_200(
     fake_check_pings_api_result, respx_mock, test_async_client
 ):
-    assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/pings/")
     respx_mock.get(checks_url).mock(
         return_value=Response(
@@ -166,7 +163,6 @@ async def test_get_check_pings_200(
 async def test_get_check_flips_200(
     fake_check_flips_api_result, respx_mock, test_async_client
 ):
-    assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/flips/")
     respx_mock.get(checks_url).mock(
         return_value=Response(status_code=200, json=fake_check_flips_api_result)
@@ -181,7 +177,6 @@ async def test_get_check_flips_200(
 async def test_get_check_flips_params_200(
     fake_check_flips_api_result, respx_mock, test_async_client
 ):
-    assert test_async_client._client is not None
     checks_url = urljoin(
         test_async_client._api_url, "checks/test/flips/?seconds=1&start=1&end=1"
     )
@@ -198,8 +193,32 @@ async def test_get_check_flips_params_200(
 async def test_get_check_flips_400(
     fake_check_flips_api_result, respx_mock, test_async_client
 ):
-    assert test_async_client._client is not None
-    checks_url = urljoin(test_async_client._api_url, "checks/test/flips/")
-    respx_mock.get(checks_url).mock(return_value=Response(status_code=400))
+    flips_url = urljoin(test_async_client._api_url, "checks/test/flips/")
+    respx_mock.get(flips_url).mock(return_value=Response(status_code=400))
     with pytest.raises(BadAPIRequestError):
         await test_async_client.get_check_flips("test")
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
+async def test_get_integrations(
+    fake_integrations_api_result, respx_mock, test_async_client
+):
+    channels_url = urljoin(test_async_client._api_url, "channels/")
+    respx_mock.get(channels_url).mock(
+        return_value=Response(status_code=200, json=fake_integrations_api_result)
+    )
+    integrations = await test_async_client.get_integrations()
+    assert len(integrations) == len(fake_integrations_api_result["channels"])
+    assert integrations[0].id == fake_integrations_api_result["channels"][0]["id"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
+async def test_get_badges(fake_badges_api_result, respx_mock, test_async_client):
+    channels_url = urljoin(test_async_client._api_url, "badges/")
+    respx_mock.get(channels_url).mock(
+        return_value=Response(status_code=200, json=fake_badges_api_result)
+    )
+    integrations = await test_async_client.get_badges()
+    assert integrations.keys() == fake_badges_api_result["badges"].keys()
