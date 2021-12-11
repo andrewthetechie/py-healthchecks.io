@@ -7,7 +7,7 @@ from httpx import Response
 
 from healthchecks_io.client import AsyncClient
 from healthchecks_io.client.exceptions import HCAPIAuthError
-from healthchecks_io.client.exceptions import HCAPIError
+from healthchecks_io.client.exceptions import HCAPIError, CheckNotFoundError
 
 
 @pytest.mark.asyncio
@@ -86,3 +86,15 @@ async def test_get_check_200(fake_check_api_result, respx_mock, test_async_clien
     )
     check = await test_async_client.get_check(check_id="test")
     assert check.name == fake_check_api_result["name"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
+async def test_check_get_404(respx_mock, test_async_client):
+    assert test_async_client._client is not None
+    checks_url = urljoin(test_async_client._api_url, "checks/test")
+    respx_mock.get(checks_url).mock(
+        return_value=Response(status_code=404)
+    )
+    with pytest.raises(CheckNotFoundError):
+        await test_async_client.get_check("test")
