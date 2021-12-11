@@ -19,7 +19,9 @@ from .exceptions import BadAPIRequestError
 from .exceptions import CheckNotFoundError
 from .exceptions import HCAPIAuthError
 from .exceptions import HCAPIError
+from healthchecks_io.schemas import badges
 from healthchecks_io.schemas import checks
+from healthchecks_io.schemas import integrations
 
 
 class AbstractClient(ABC):
@@ -174,6 +176,47 @@ class AbstractClient(ABC):
         Returns:
             List[checks.CheckStatuses]: List of status flips for this check
 
+        """
+        pass
+
+    @abstractmethod
+    def get_integrations(
+        self,
+    ) -> List[Optional[integrations.Integration]]:  # pragma: no cover
+        """Returns a list of integrations belonging to the project.
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+
+        Returns:
+            List[Optional[integrations.Integration]]: List of integrations for the project
+
+        """
+        pass
+
+    @abstractmethod
+    def get_badges(self) -> Dict[str, badges.Badges]:  # pragma: no cover
+        """Returns a dict of all tags in the project, with badge URLs for each tag.
+
+        Healthchecks.io provides badges in a few different formats:
+        svg: returns the badge as a SVG document.
+        json: returns a JSON document which you can use to generate a custom badge yourself.
+        shields: returns JSON in a Shields.io compatible format.
+        In addition, badges have 2-state and 3-state variations:
+
+        svg, json, shields: reports two states: "up" and "down". It considers any checks in the grace period as still "up".
+        svg3, json3, shields3: reports three states: "up", "late", and "down".
+
+        The response includes a special * entry: this pseudo-tag reports the overal status
+        of all checks in the project.
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+
+        Returns:
+            Dict[str, badges.Badges]: Dictionary of all tags in the project with badges
         """
         pass
 

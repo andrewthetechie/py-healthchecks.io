@@ -1,5 +1,6 @@
 """An async healthchecks.io client."""
 import asyncio
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -7,7 +8,9 @@ from httpx import AsyncClient as HTTPXAsyncClient
 
 from ._abstract import AbstractClient
 from healthchecks_io import VERSION
+from healthchecks_io.schemas import badges
 from healthchecks_io.schemas import checks
+from healthchecks_io.schemas import integrations
 
 
 class AsyncClient(AbstractClient):
@@ -205,3 +208,50 @@ class AsyncClient(AbstractClient):
         request_url = self._get_api_request_url(f"checks/{check_id}/flips/", params)
         response = self.check_response(await self._client.get(request_url))
         return [checks.CheckStatuses(**status_data) for status_data in response.json()]
+
+    async def get_integrations(self) -> List[Optional[integrations.Integration]]:
+        """Returns a list of integrations belonging to the project.
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+
+        Returns:
+            List[Optional[integrations.Integration]]: List of integrations for the project
+
+        """
+        request_url = self._get_api_request_url("channels/")
+        response = self.check_response(await self._client.get(request_url))
+        return [
+            integrations.Integration.from_api_result(integration_dict)
+            for integration_dict in response.json()["channels"]
+        ]
+
+    async def get_badges(self) -> Dict[str, badges.Badges]:
+        """Returns a dict of all tags in the project, with badge URLs for each tag.
+
+        Healthchecks.io provides badges in a few different formats:
+        svg: returns the badge as a SVG document.
+        json: returns a JSON document which you can use to generate a custom badge yourself.
+        shields: returns JSON in a Shields.io compatible format.
+        In addition, badges have 2-state and 3-state variations:
+
+        svg, json, shields: reports two states: "up" and "down". It considers any checks in the grace period as still "up".
+        svg3, json3, shields3: reports three states: "up", "late", and "down".
+
+        The response includes a special * entry: this pseudo-tag reports the overal status
+        of all checks in the project.
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+
+        Returns:
+            Dict[str, badges.Badges]: Dictionary of all tags in the project with badges
+        """
+        request_url = self._get_api_request_url("badges/")
+        response = self.check_response(await self._client.get(request_url))
+        return {
+            key: badges.Badges.from_api_result(item)
+            for key, item in response.json()["badges"].items()
+        }
