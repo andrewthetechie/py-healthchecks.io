@@ -4,6 +4,7 @@ from typing import Union
 
 import pytest
 
+from healthchecks_io.client import AsyncClient
 from healthchecks_io.schemas import checks
 
 
@@ -78,3 +79,10 @@ def fake_ro_check(fake_check: checks.Check):
     fake_check.update_url = None
     fake_check.pause_url = None
     yield fake_check
+
+
+@pytest.fixture
+def test_async_client():
+    """An AsyncClient for testing, set to a nonsense url so we aren't pinging healtchecks."""
+
+    yield AsyncClient(api_key="test", api_url="https://localhost/api")

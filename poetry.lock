@@ -753,6 +753,28 @@ toml = "*"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "pytest-async"
+version = "0.1.1"
+description = "pytest-async - Run your coroutine in event loop without decorator"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "pytest-asyncio"
+version = "0.16.0"
+description = "Pytest support for asyncio."
+category = "dev"
+optional = false
+python-versions = ">= 3.6"
+
+[package.dependencies]
+pytest = ">=5.4.0"
+
+[package.extras]
+testing = ["coverage", "hypothesis (>=5.7.1)"]
+
+[[package]]
 name = "pytest-cov"
 version = "3.0.0"
 description = "Pytest plugin for measuring coverage."
@@ -766,6 +788,20 @@ pytest = ">=4.6"
 
 [package.extras]
 testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtualenv"]
+
+[[package]]
+name = "pytest-mock"
+version = "3.6.1"
+description = "Thin-wrapper around the mock package for easier use with pytest"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytest = ">=5.0"
+
+[package.extras]
+dev = ["pre-commit", "tox", "pytest-asyncio"]
 
 [[package]]
 name = "python-dateutil"
@@ -841,6 +877,17 @@ urllib3 = ">=1.21.1,<1.27"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
+
+[[package]]
+name = "respx"
+version = "0.19.0"
+description = "A utility for mocking out the Python HTTPX and HTTP Core libraries."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+httpx = ">=0.21.0"
 
 [[package]]
 name = "restructuredtext-lint"
@@ -1231,7 +1278,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "062c8a09c8967fafd0410a702d9bdc17ef0a260965b65345c6058a3a134a05a3"
+content-hash = "4609efb7758ecc2785e3e38e1b1bad140bd0311d253ffebd86b9e5d4e4d45766"
 
 [metadata.files]
 alabaster = [
@@ -1637,9 +1684,21 @@ pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
+pytest-async = [
+    {file = "pytest_async-0.1.1-py3-none-any.whl", hash = "sha256:11cc41eef82592951d56c2bb9b0e6ab21b2f0f00663e78d95694a80d965be930"},
+    {file = "pytest_async-0.1.1.tar.gz", hash = "sha256:0d6ffd3ebac2f3aa47d606dbae1984750268a89dc8caf4a908ba61c60299cdfd"},
+]
+pytest-asyncio = [
+    {file = "pytest-asyncio-0.16.0.tar.gz", hash = "sha256:7496c5977ce88c34379df64a66459fe395cd05543f0a2f837016e7144391fcfb"},
+    {file = "pytest_asyncio-0.16.0-py3-none-any.whl", hash = "sha256:5f2a21273c47b331ae6aa5b36087047b4899e40f03f18397c0e65fa5cca54e9b"},
+]
 pytest-cov = [
     {file = "pytest-cov-3.0.0.tar.gz", hash = "sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470"},
     {file = "pytest_cov-3.0.0-py3-none-any.whl", hash = "sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6"},
+]
+pytest-mock = [
+    {file = "pytest-mock-3.6.1.tar.gz", hash = "sha256:40217a058c52a63f1042f0784f62009e976ba824c418cced42e88d5f40ab0e62"},
+    {file = "pytest_mock-3.6.1-py3-none-any.whl", hash = "sha256:30c2f2cc9759e76eee674b81ea28c9f0b94f8f0445a1b87762cadf774f0df7e3"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
@@ -1771,6 +1830,10 @@ reorder-python-imports = [
 requests = [
     {file = "requests-2.26.0-py2.py3-none-any.whl", hash = "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24"},
     {file = "requests-2.26.0.tar.gz", hash = "sha256:b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b01b07a7"},
+]
+respx = [
+    {file = "respx-0.19.0-py2.py3-none-any.whl", hash = "sha256:1ac1cc99bf892ffd3e33108ae43d71d8309a58ac226965f4bd81ec055600f265"},
+    {file = "respx-0.19.0.tar.gz", hash = "sha256:4a09e15803c7450d45303520ec528794c9fd77b05984263bc83b78aabbb39413"},
 ]
 restructuredtext-lint = [
     {file = "restructuredtext_lint-1.3.2.tar.gz", hash = "sha256:d3b10a1fe2ecac537e51ae6d151b223b78de9fafdd50e5eb6b08c243df173c80"},
