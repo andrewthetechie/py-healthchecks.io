@@ -12,10 +12,12 @@ class HCAPIAuthError(HCAPIError):
 
     ...
 
+
 class CheckNotFoundError(HCAPIError):
     """Thrown when getting a check returns a 404."""
 
     ...
+
 
 class BadAPIRequestError(HCAPIError):
     """Thrown when an api request returns a 400."""

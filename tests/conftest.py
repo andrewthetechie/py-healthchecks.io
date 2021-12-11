@@ -87,10 +87,11 @@ def test_async_client():
 
     yield AsyncClient(api_key="test", api_url="https://localhost/api")
 
+
 @pytest.fixture
 def fake_check_pings_api_result():
     return [
-            {
+        {
             "type": "success",
             "date": "2020-06-09T14:51:06.113073+00:00",
             "n": 4,
@@ -98,18 +99,18 @@ def fake_check_pings_api_result():
             "remote_addr": "192.0.2.0",
             "method": "GET",
             "ua": "curl/7.68.0",
-            "duration": 2.896736
-            },
-            {
+            "duration": 2.896736,
+        },
+        {
             "type": "start",
             "date": "2020-06-09T14:51:03.216337+00:00",
             "n": 3,
             "scheme": "http",
             "remote_addr": "192.0.2.0",
             "method": "GET",
-            "ua": "curl/7.68.0"
-            },
-            {
+            "ua": "curl/7.68.0",
+        },
+        {
             "type": "success",
             "date": "2020-06-09T14:50:59.633577+00:00",
             "n": 2,
@@ -117,32 +118,24 @@ def fake_check_pings_api_result():
             "remote_addr": "192.0.2.0",
             "method": "GET",
             "ua": "curl/7.68.0",
-            "duration": 2.997976
-            },
-            {
+            "duration": 2.997976,
+        },
+        {
             "type": "start",
             "date": "2020-06-09T14:50:56.635601+00:00",
             "n": 1,
             "scheme": "http",
             "remote_addr": "192.0.2.0",
             "method": "GET",
-            "ua": "curl/7.68.0"
-            }
-        ]
+            "ua": "curl/7.68.0",
+        },
+    ]
+
 
 @pytest.fixture
 def fake_check_flips_api_result():
     return [
-        {
-        "timestamp": "2020-03-23T10:18:23+00:00",
-        "up": 1
-        },
-        {
-        "timestamp": "2020-03-23T10:17:15+00:00",
-        "up": 0
-        },
-        {
-        "timestamp": "2020-03-23T10:16:18+00:00",
-        "up": 1
-        }
+        {"timestamp": "2020-03-23T10:18:23+00:00", "up": 1},
+        {"timestamp": "2020-03-23T10:17:15+00:00", "up": 0},
+        {"timestamp": "2020-03-23T10:16:18+00:00", "up": 1},
     ]

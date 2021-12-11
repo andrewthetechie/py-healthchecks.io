@@ -6,8 +6,10 @@ from httpx import AsyncClient as HTTPXAsyncClient
 from httpx import Response
 
 from healthchecks_io.client import AsyncClient
+from healthchecks_io.client.exceptions import BadAPIRequestError
+from healthchecks_io.client.exceptions import CheckNotFoundError
 from healthchecks_io.client.exceptions import HCAPIAuthError
-from healthchecks_io.client.exceptions import HCAPIError, CheckNotFoundError, BadAPIRequestError
+from healthchecks_io.client.exceptions import HCAPIError
 
 
 @pytest.mark.asyncio
@@ -93,9 +95,7 @@ async def test_get_check_200(fake_check_api_result, respx_mock, test_async_clien
 async def test_check_get_404(respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
-    respx_mock.get(checks_url).mock(
-        return_value=Response(status_code=404)
-    )
+    respx_mock.get(checks_url).mock(return_value=Response(status_code=404))
     with pytest.raises(CheckNotFoundError):
         await test_async_client.get_check("test")
 
@@ -117,9 +117,7 @@ async def test_pause_check_200(fake_check_api_result, respx_mock, test_async_cli
 async def test_check_pause_404(respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/pause")
-    respx_mock.post(checks_url).mock(
-        return_value=Response(status_code=404)
-    )
+    respx_mock.post(checks_url).mock(return_value=Response(status_code=404))
     with pytest.raises(CheckNotFoundError):
         await test_async_client.pause_check("test")
 
@@ -141,28 +139,33 @@ async def test_delete_check_200(fake_check_api_result, respx_mock, test_async_cl
 async def test_delete_pause404(respx_mock, test_async_client):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test")
-    respx_mock.delete(checks_url).mock(
-        return_value=Response(status_code=404)
-    )
+    respx_mock.delete(checks_url).mock(return_value=Response(status_code=404))
     with pytest.raises(CheckNotFoundError):
         await test_async_client.delete_check("test")
 
+
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_pings_200(fake_check_pings_api_result, respx_mock, test_async_client):
+async def test_get_check_pings_200(
+    fake_check_pings_api_result, respx_mock, test_async_client
+):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/pings/")
     respx_mock.get(checks_url).mock(
-        return_value=Response(status_code=200, json={"pings": fake_check_pings_api_result})
+        return_value=Response(
+            status_code=200, json={"pings": fake_check_pings_api_result}
+        )
     )
     pings = await test_async_client.get_check_pings("test")
     assert len(pings) == len(fake_check_pings_api_result)
-    assert pings[0].type == fake_check_pings_api_result[0]['type']
+    assert pings[0].type == fake_check_pings_api_result[0]["type"]
 
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_flips_200(fake_check_flips_api_result, respx_mock, test_async_client):
+async def test_get_check_flips_200(
+    fake_check_flips_api_result, respx_mock, test_async_client
+):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/flips/")
     respx_mock.get(checks_url).mock(
@@ -170,29 +173,33 @@ async def test_get_check_flips_200(fake_check_flips_api_result, respx_mock, test
     )
     flips = await test_async_client.get_check_flips("test")
     assert len(flips) == len(fake_check_flips_api_result)
-    assert flips[0].up == fake_check_flips_api_result[0]['up']
+    assert flips[0].up == fake_check_flips_api_result[0]["up"]
 
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_flips_params_200(fake_check_flips_api_result, respx_mock, test_async_client):
+async def test_get_check_flips_params_200(
+    fake_check_flips_api_result, respx_mock, test_async_client
+):
     assert test_async_client._client is not None
-    checks_url = urljoin(test_async_client._api_url, "checks/test/flips/?seconds=1&start=1&end=1")
+    checks_url = urljoin(
+        test_async_client._api_url, "checks/test/flips/?seconds=1&start=1&end=1"
+    )
     respx_mock.get(checks_url).mock(
         return_value=Response(status_code=200, json=fake_check_flips_api_result)
     )
     flips = await test_async_client.get_check_flips("test", seconds=1, start=1, end=1)
     assert len(flips) == len(fake_check_flips_api_result)
-    assert flips[0].up == fake_check_flips_api_result[0]['up']
+    assert flips[0].up == fake_check_flips_api_result[0]["up"]
 
 
 @pytest.mark.asyncio
 @pytest.mark.respx
-async def test_get_check_flips_400(fake_check_flips_api_result, respx_mock, test_async_client):
+async def test_get_check_flips_400(
+    fake_check_flips_api_result, respx_mock, test_async_client
+):
     assert test_async_client._client is not None
     checks_url = urljoin(test_async_client._api_url, "checks/test/flips/")
-    respx_mock.get(checks_url).mock(
-        return_value=Response(status_code=400)
-    )
+    respx_mock.get(checks_url).mock(return_value=Response(status_code=400))
     with pytest.raises(BadAPIRequestError):
         await test_async_client.get_check_flips("test")

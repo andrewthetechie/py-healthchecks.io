@@ -73,9 +73,9 @@ class AsyncClient(AbstractClient):
             checks.Check.from_api_result(check_data)
             for check_data in response.json()["checks"]
         ]
-    
+
     async def get_check(self, check_id: str) -> checks.Check:
-        """Get a single check by id. 
+        """Get a single check by id.
 
         check_id can either be a check uuid if using a read/write api key
         or a unique key if using a read only api key.
@@ -97,9 +97,9 @@ class AsyncClient(AbstractClient):
         return checks.Check.from_api_result(response.json())
 
     async def pause_check(self, check_id: str) -> checks.Check:
-        """Disables monitoring for a check without removing it. 
-        
-        The check goes into a "paused" state. 
+        """Disables monitoring for a check without removing it.
+
+        The check goes into a "paused" state.
         You can resume monitoring of the check by pinging it.
 
         check_id must be a uuid, not a unique id
@@ -117,11 +117,11 @@ class AsyncClient(AbstractClient):
 
         """
         request_url = self._get_api_request_url(f"checks/{check_id}/pause")
-        response = self.check_response(await self._client.post(request_url , data={}))
+        response = self.check_response(await self._client.post(request_url, data={}))
         return checks.Check.from_api_result(response.json())
 
     async def delete_check(self, check_id: str) -> checks.Check:
-        """Permanently deletes the check from the user's account. 
+        """Permanently deletes the check from the user's account.
 
         check_id must be a uuid, not a unique id
 
@@ -143,9 +143,9 @@ class AsyncClient(AbstractClient):
 
     async def get_check_pings(self, check_id: str) -> List[checks.CheckPings]:
         """Returns a list of pings this check has received.
-        
-        This endpoint returns pings in reverse order (most recent first), 
-        and the total number of returned pings depends on the account's 
+
+        This endpoint returns pings in reverse order (most recent first),
+        and the total number of returned pings depends on the account's
         billing plan: 100 for free accounts, 1000 for paid accounts.
 
         Args:
@@ -167,10 +167,15 @@ class AsyncClient(AbstractClient):
             for check_data in response.json()["pings"]
         ]
 
-    async def get_check_flips(self, check_id: str, seconds: Optional[int] = None, start: Optional[int] = None, end: Optional[int] = None) -> List[checks.CheckStatuses]:
-        """
-        Returns a list of "flips" this check has experienced. 
-        
+    async def get_check_flips(
+        self,
+        check_id: str,
+        seconds: Optional[int] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+    ) -> List[checks.CheckStatuses]:
+        """Returns a list of "flips" this check has experienced.
+
         A flip is a change of status (from "down" to "up," or from "up" to "down").
 
         Raises:
@@ -187,19 +192,16 @@ class AsyncClient(AbstractClient):
 
         Returns:
             List[checks.CheckStatuses]: List of status flips for this check
-        
+
         """
         params = dict()
-        if seconds is not None and seconds >=0:
-            params['seconds'] = seconds
+        if seconds is not None and seconds >= 0:
+            params["seconds"] = seconds
         if start is not None and start >= 0:
-            params['start'] = start
+            params["start"] = start
         if end is not None and end >= 0:
-            params['end'] = end
+            params["end"] = end
 
         request_url = self._get_api_request_url(f"checks/{check_id}/flips/", params)
         response = self.check_response(await self._client.get(request_url))
-        return [
-            checks.CheckStatuses(**status_data)
-            for status_data in response.json()
-        ]
+        return [checks.CheckStatuses(**status_data) for status_data in response.json()]
