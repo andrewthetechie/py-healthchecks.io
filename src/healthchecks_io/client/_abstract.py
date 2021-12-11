@@ -44,12 +44,14 @@ class AbstractClient(ABC):
         self._finalizer = finalize(self, self._finalizer_method)
 
     @abstractmethod
-    def _finalizer_method(self):
+    def _finalizer_method(self):  # pragma: no cover
         """Finalizer method is called by weakref.finalize when the object is dereferenced to do cleanup of clients."""
         pass
 
     @abstractmethod
-    def get_checks(self, tags: Optional[List[str]]) -> List[checks.Check]:
+    def get_checks(
+        self, tags: Optional[List[str]]
+    ) -> List[checks.Check]:  # pragma: no cover
         """Calls the API's /checks/ endpoint to get a list of checks."""
         pass
 
