@@ -1,2 +1,3 @@
 """healthchecks_io clients."""
-from .asyncclient import AsyncClient  # noqa: F401
+from .async_client import AsyncClient  # noqa: F401
+from .sync_client import Client  # noqa: F401

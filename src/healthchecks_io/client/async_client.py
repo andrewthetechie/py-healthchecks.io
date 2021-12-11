@@ -38,7 +38,7 @@ class AsyncClient(AbstractClient):
             api_key=api_key, api_url=api_url, api_version=api_version, client=client
         )
         self._client.headers["X-Api-Key"] = self._api_key
-        self._client.headers["user-agent"] = f"py-healthchecks.io/{VERSION}"
+        self._client.headers["user-agent"] = f"py-healthchecks.io-async/{VERSION}"
         self._client.headers["Content-type"] = "application/json"
 
     def _finalizer_method(self):
