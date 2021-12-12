@@ -222,3 +222,79 @@ async def test_aget_badges(fake_badges_api_result, respx_mock, test_async_client
     )
     integrations = await test_async_client.get_badges()
     assert integrations.keys() == fake_badges_api_result["badges"].keys()
+
+
+ping_test_parameters = [
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "test",
+        "success_ping",
+        {"uuid": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "1234/test",
+        "success_ping",
+        {"slug": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "test/start",
+        "start_ping",
+        {"uuid": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "1234/test/start",
+        "start_ping",
+        {"slug": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "test/fail",
+        "fail_ping",
+        {"uuid": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "1234/test/fail",
+        "fail_ping",
+        {"slug": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "test/0",
+        "exit_code_ping",
+        {"exit_code": 0, "uuid": "test"},
+    ),
+    (
+        pytest.lazy_fixture("respx_mock"),
+        pytest.lazy_fixture("test_async_client"),
+        "1234/test/0",
+        "exit_code_ping",
+        {"exit_code": 0, "slug": "test"},
+    ),
+]
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
+@pytest.mark.parametrize(
+    "respx_mocker, tc, url, ping_method, method_kwargs", ping_test_parameters
+)
+async def test_success_ping(respx_mocker, tc, url, ping_method, method_kwargs):
+    channels_url = urljoin(tc._ping_url, url)
+    respx_mocker.get(channels_url).mock(
+        return_value=Response(status_code=200, text="OK")
+    )
+    ping_method = getattr(tc, ping_method)
+    result = await ping_method(**method_kwargs)
+    assert result[0] is True
+    assert result[1] == "OK"

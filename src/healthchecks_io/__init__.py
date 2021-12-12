@@ -7,6 +7,8 @@ from .client.exceptions import BadAPIRequestError  # noqa: F401, E402
 from .client.exceptions import CheckNotFoundError  # noqa: F401, E402
 from .client.exceptions import HCAPIAuthError  # noqa: F401, E402
 from .client.exceptions import HCAPIError  # noqa: F401, E402
+from .client.exceptions import HCAPIRateLimitError  # noqa: F401, E402
+from .client.exceptions import NonUniqueSlugError  # noqa: F401, E402
 
 __all__ = [
     "AsyncClient",
@@ -15,4 +17,7 @@ __all__ = [
     "CheckNotFoundError",
     "HCAPIAuthError",
     "HCAPIError",
+    "CheckNotFoundError",
+    "HCAPIRateLimitError",
+    "NonUniqueSlugError",
 ]

@@ -35,6 +35,14 @@ nox.options.sessions = (
     "docs-build",
 )
 mypy_type_packages = ("types-croniter", "types-pytz")
+test_requirements = (
+    "coverage[toml]",
+    "pytest",
+    "pygments",
+    "respx",
+    "pytest-asyncio",
+    "pytest-lazy-fixture",
+)
 
 
 def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
@@ -158,7 +166,7 @@ def bandit(session: Session) -> None:
 def tests(session: Session) -> None:
     """Run the test suite."""
     session.install(".")
-    session.install("coverage[toml]", "pytest", "pygments", "respx", "pytest-asyncio")
+    session.install(*test_requirements)
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest", *session.posargs)
     finally:

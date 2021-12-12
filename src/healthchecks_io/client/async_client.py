@@ -3,6 +3,7 @@ import asyncio
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from httpx import AsyncClient as HTTPXAsyncClient
 
@@ -18,16 +19,20 @@ class AsyncClient(AbstractClient):
 
     def __init__(
         self,
-        api_key: str,
+        api_key: str = "",
+        ping_key: str = "",
         api_url: str = "https://healthchecks.io/api/",
+        ping_url: str = "https://hc-ping.com/",
         api_version: int = 1,
         client: Optional[HTTPXAsyncClient] = None,
     ) -> None:
         """An AsyncClient can be used in code using asyncio to work with the Healthchecks.io api.
 
         Args:
-            api_key (str): Healthchecks.io API key
+            api_key (str): Healthchecks.io API key. Defaults to an empty string.
+            ping_key (str): Healthchecks.io Ping key. Defaults to an empty string.
             api_url (str): API URL. Defaults to "https://healthchecks.io/api/".
+            ping_url (str): Ping API url. Defaults to "https://hc-ping.com/"
             api_version (int): Versiopn of the api to use. Defaults to 1.
             client (Optional[HTTPXAsyncClient], optional): A httpx.Asyncclient. If not
                 passed in, one will be created for this object. Defaults to None.
@@ -35,7 +40,13 @@ class AsyncClient(AbstractClient):
         self._client: HTTPXAsyncClient = (
             HTTPXAsyncClient() if client is None else client
         )
-        super().__init__(api_key=api_key, api_url=api_url, api_version=api_version)
+        super().__init__(
+            api_key=api_key,
+            ping_key=ping_key,
+            api_url=api_url,
+            ping_url=ping_url,
+            api_version=api_version,
+        )
         self._client.headers["X-Api-Key"] = self._api_key
         self._client.headers["user-agent"] = f"py-healthchecks.io-async/{VERSION}"
         self._client.headers["Content-type"] = "application/json"
@@ -58,6 +69,8 @@ class AsyncClient(AbstractClient):
         Raises:
             HCAPIAuthError: When the API returns a 401, indicates an api key issue
             HCAPIError: When the API returns anything other than a 200 or 401
+            HCAPIRateLimitError: Raised when status code is 429
+
 
         Returns:
             List[checks.Check]: [description]
@@ -92,6 +105,8 @@ class AsyncClient(AbstractClient):
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
             CheckNotFoundError: Raised when status_code is 404
+            HCAPIRateLimitError: Raised when status code is 429
+
 
         """
         request_url = self._get_api_request_url(f"checks/{check_id}")
@@ -137,6 +152,7 @@ class AsyncClient(AbstractClient):
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
             CheckNotFoundError: Raised when status_code is 404
+            HCAPIRateLimitError: Raised when status code is 429
 
         """
         request_url = self._get_api_request_url(f"checks/{check_id}")
@@ -160,6 +176,8 @@ class AsyncClient(AbstractClient):
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
             CheckNotFoundError: Raised when status_code is 404
+            HCAPIRateLimitError: Raised when status code is 429
+
 
         """
         request_url = self._get_api_request_url(f"checks/{check_id}/pings/")
@@ -185,6 +203,8 @@ class AsyncClient(AbstractClient):
             HCAPIError: Raised when status_code is 5xx
             CheckNotFoundError: Raised when status_code is 404
             BadAPIRequestError: Raised when status_code is 400
+            HCAPIRateLimitError: Raised when status code is 429
+
 
         Args:
             check_id (str): check uuid
@@ -214,6 +234,7 @@ class AsyncClient(AbstractClient):
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
+            HCAPIRateLimitError: Raised when status code is 429
 
         Returns:
             List[Optional[integrations.Integration]]: List of integrations for the project
@@ -244,14 +265,151 @@ class AsyncClient(AbstractClient):
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
             HCAPIError: Raised when status_code is 5xx
+            HCAPIRateLimitError: Raised when status code is 429
 
         Returns:
             Dict[str, badges.Badges]: Dictionary of all tags in the project with badges
         """
         request_url = self._get_api_request_url("badges/")
-        url = await self._client.get(request_url)
-        response = self.check_response(url)
+        response = self.check_response(await self._client.get(request_url))
         return {
             key: badges.Badges.from_api_result(item)
             for key, item in response.json()["badges"].items()
         }
+
+    async def success_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+        """Signals to Healthchecks.io that a job has completed successfully.
+
+        Can also be used to indicate a continuously running process is still running and healthy.
+
+        Can take a uuid or a slug. If you call with a slug, you much have a
+        ping key set.
+
+        Check's slug is not guaranteed to be unique. If multiple checks in the
+        project have the same name, they also have the same slug. If you make
+        a Pinging API request using a non-unique slug, Healthchecks.io will
+        return the "409 Conflict" HTTP status code and ignore the request.
+
+        Args:
+            uuid (str): Check's UUID. Defaults to "".
+            slug (str):  Check's Slug. Defaults to "".
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404 or response text has "not found" in it
+            BadAPIRequestError: Raised when status_code is 400, or if you pass a uuid and a slug, or if
+                pinging by a slug and do not have a ping key set
+            HCAPIRateLimitError: Raised when status code is 429 or response text has "rate limited" in it
+            NonUniqueSlugError: Raused when status code is 409.
+
+        Returns:
+            Tuple[bool, str]: success (true or false) and the response text
+        """
+        ping_url = self._get_ping_url(uuid, slug, "")
+        response = self.check_ping_response(await self._client.get(ping_url))
+        return (True if response.status_code == 200 else False, response.text)
+
+    async def start_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+        """Sends a "job has started!" message to Healthchecks.io.
+
+        Sending a "start" signal is optional, but it enables a few extra features:
+        * Healthchecks.io will measure and display job execution times
+        * Healthchecks.io will detect if the job runs longer than its configured grace time
+
+        Can take a uuid or a slug. If you call with a slug, you much have a
+        ping key set.
+
+        Check's slug is not guaranteed to be unique. If multiple checks in the
+        project have the same name, they also have the same slug. If you make
+        a Pinging API request using a non-unique slug, Healthchecks.io will
+        return the "409 Conflict" HTTP status code and ignore the request.
+
+        Args:
+            uuid (str): Check's UUID. Defaults to "".
+            slug (str): Check's Slug. Defaults to "".
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404 or response text has "not found" in it
+            BadAPIRequestError: Raised when status_code is 400, or if you pass a uuid and a slug, or if
+                pinging by a slug and do not have a ping key set
+            HCAPIRateLimitError: Raised when status code is 429 or response text has "rate limited" in it
+            NonUniqueSlugError: Raused when status code is 409.
+
+        Returns:
+            Tuple[bool, str]: success (true or false) and the response text
+        """
+        ping_url = self._get_ping_url(uuid, slug, "/start")
+        response = self.check_ping_response(await self._client.get(ping_url))
+        return (True if response.status_code == 200 else False, response.text)
+
+    async def fail_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+        """Signals to Healthchecks.io that the job has failed.
+
+        Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
+
+        Can take a uuid or a slug. If you call with a slug, you much have a
+        ping key set.
+
+        Check's slug is not guaranteed to be unique. If multiple checks in the
+        project have the same name, they also have the same slug. If you make
+        a Pinging API request using a non-unique slug, Healthchecks.io will
+        return the "409 Conflict" HTTP status code and ignore the request.
+
+        Args:
+            uuid (str): Check's UUID. Defaults to "".
+            slug (str): Check's Slug. Defaults to "".
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404 or response text has "not found" in it
+            BadAPIRequestError: Raised when status_code is 400, or if you pass a uuid and a slug, or if
+                pinging by a slug and do not have a ping key set
+            HCAPIRateLimitError: Raised when status code is 429 or response text has "rate limited" in it
+            NonUniqueSlugError: Raused when status code is 409.
+
+        Returns:
+            Tuple[bool, str]: success (true or false) and the response text
+        """
+        ping_url = self._get_ping_url(uuid, slug, "/fail")
+        response = self.check_ping_response(await self._client.get(ping_url))
+        return (True if response.status_code == 200 else False, response.text)
+
+    async def exit_code_ping(
+        self, exit_code: int, uuid: str = "", slug: str = ""
+    ) -> Tuple[bool, str]:
+        """Signals to Healthchecks.io that the job has failed.
+
+        Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
+
+        Can take a uuid or a slug. If you call with a slug, you much have a
+        ping key set.
+
+        Check's slug is not guaranteed to be unique. If multiple checks in the
+        project have the same name, they also have the same slug. If you make
+        a Pinging API request using a non-unique slug, Healthchecks.io will
+        return the "409 Conflict" HTTP status code and ignore the request.
+
+        Args:
+            exit_code (int): Exit code to sent, int from 0 to 255
+            uuid (str): Check's UUID. Defaults to "".
+            slug (str): Check's Slug. Defaults to "".
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404 or response text has "not found" in it
+            BadAPIRequestError: Raised when status_code is 400, or if you pass a uuid and a slug, or if
+                pinging by a slug and do not have a ping key set
+            HCAPIRateLimitError: Raised when status code is 429 or response text has "rate limited" in it
+            NonUniqueSlugError: Raused when status code is 409.
+
+        Returns:
+            Tuple[bool, str]: success (true or false) and the response text
+        """
+        ping_url = self._get_ping_url(uuid, slug, f"/{exit_code}")
+        response = self.check_ping_response(await self._client.get(ping_url))
+        return (True if response.status_code == 200 else False, response.text)

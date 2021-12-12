@@ -6,6 +6,7 @@ import pytest
 
 from healthchecks_io import AsyncClient
 from healthchecks_io import Client
+from healthchecks_io.client._abstract import AbstractClient
 from healthchecks_io.schemas import checks
 
 
@@ -82,16 +83,30 @@ def fake_ro_check(fake_check: checks.Check):
     yield fake_check
 
 
+client_kwargs = {
+    "api_key": "test",
+    "api_url": "https://localhost/api",
+    "ping_url": "https://localhost/ping",
+    "ping_key": "1234",
+}
+
+
 @pytest.fixture
 def test_async_client():
     """An AsyncClient for testing, set to a nonsense url so we aren't pinging healtchecks."""
-    yield AsyncClient(api_key="test", api_url="https://localhost/api")
+    yield AsyncClient(**client_kwargs)
 
 
 @pytest.fixture
 def test_client():
     """A Client for testing, set to a nonsense url so we aren't pinging healtchecks."""
-    yield Client(api_key="test", api_url="https://localhost/api")
+    yield Client(**client_kwargs)
+
+
+@pytest.fixture
+def test_abstract_client():
+    AbstractClient.__abstractmethods__ = set()
+    yield AbstractClient(**client_kwargs)
 
 
 @pytest.fixture

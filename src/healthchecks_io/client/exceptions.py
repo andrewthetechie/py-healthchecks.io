@@ -23,3 +23,15 @@ class BadAPIRequestError(HCAPIError):
     """Thrown when an api request returns a 400."""
 
     ...
+
+
+class HCAPIRateLimitError(HCAPIError):
+    """Thrown when the api returns a rate limit response."""
+
+    ...
+
+
+class NonUniqueSlugError(HCAPIError):
+    """Thrown when the api returns a 409 when pinging."""
+
+    ...

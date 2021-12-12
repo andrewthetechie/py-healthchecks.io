@@ -18,6 +18,8 @@ from .exceptions import BadAPIRequestError
 from .exceptions import CheckNotFoundError
 from .exceptions import HCAPIAuthError
 from .exceptions import HCAPIError
+from .exceptions import HCAPIRateLimitError
+from .exceptions import NonUniqueSlugError
 
 
 class AbstractClient(ABC):
@@ -25,21 +27,29 @@ class AbstractClient(ABC):
 
     def __init__(
         self,
-        api_key: str,
+        api_key: str = "",
+        ping_key: str = "",
         api_url: str = "https://healthchecks.io/api/",
+        ping_url: str = "https://hc-ping.com/",
         api_version: int = 1,
     ) -> None:
         """An AbstractClient that other clients can implement.
 
         Args:
-            api_key (str): Healthchecks.io API key
+            api_key (str): Healthchecks.io API key. Defaults to an empty string.
+            ping_key (str): Healthchecks.io Ping key. Defaults to an empty string.
             api_url (str): API URL. Defaults to "https://healthchecks.io/api/".
+            ping_url (str): Ping API url. Defaults to "https://hc-ping.com/".
             api_version (int): Versiopn of the api to use. Defaults to 1.
         """
         self._api_key = api_key
+        self._ping_key = ping_key
         if not api_url.endswith("/"):
             api_url = f"{api_url}/"
+        if not ping_url.endswith("/"):
+            ping_url = f"{ping_url}/"
         self._api_url = urljoin(api_url, f"v{api_version}/")
+        self._ping_url = ping_url
         self._finalizer = finalize(self, self._finalizer_method)
 
     @abstractmethod
@@ -62,6 +72,56 @@ class AbstractClient(ABC):
         url = urljoin(self._api_url, path)
         return self._add_url_params(url, params) if params is not None else url
 
+    def _get_ping_url(self, uuid: str, slug: str, endpoint: str) -> str:
+        """Get a url for sending a ping.
+
+        Can take either a UUID or a Slug, but not both.
+
+        Args:
+            uuid (str): uuid of a check
+            slug (str): slug of a check
+            endpoint (str): Endpoint to request
+
+        Raises:
+            BadAPIRequestError: Raised if you pass a uuid and a slug, or if pinging by a slug and do not have a ping key set
+
+        Returns:
+            str: url for this
+        """
+        if uuid == "" and slug == "" or uuid != "" and slug != "":
+            raise BadAPIRequestError("Must pass a uuid or a slug")
+
+        if slug != "" and self._ping_key == "":
+            raise BadAPIRequestError("If pinging by slug, must have a ping key set")
+
+        if uuid != "":
+            return self._get_ping_url_uuid(uuid, endpoint)
+        return self._get_ping_url_slug(slug, endpoint)
+
+    def _get_ping_url_uuid(self, uuid: str, endpoint: str) -> str:
+        """Get a ping url for a check with a uuid.
+
+        Args:
+            uuid (str): uuid of a check
+            endpoint (str): Endpoint to request
+
+        Returns:
+            str: ping url
+        """
+        return urljoin(self._ping_url, f"{uuid}{endpoint}")
+
+    def _get_ping_url_slug(self, slug: str, endpoint: str) -> str:
+        """Get a ping url for a check with a slug.
+
+        Args:
+            slug (str): slug of a check
+            endpoint (str): Endpoint to request
+
+        Returns:
+            str: ping url
+        """
+        return urljoin(self._ping_url, f"{self._ping_key}/{slug}{endpoint}")
+
     @property
     def is_closed(self) -> bool:
         """Is the client closed?
@@ -83,6 +143,7 @@ class AbstractClient(ABC):
             HCAPIError: Raised when status_code is 5xx
             CheckNotFoundError: Raised when status_code is 404
             BadAPIRequestError: Raised when status_code is 400
+            HCAPIRateLimitError: Raised when status code is 429
 
         Returns:
             Response: the passed in response object
@@ -96,12 +157,63 @@ class AbstractClient(ABC):
                 f"Status Code {response.status_code}. Response {response.text}"
             )
 
+        if response.status_code == 429:
+            raise HCAPIRateLimitError(f"Rate limited on {response.request.url}")
+
         if response.status_code == 404:
             raise CheckNotFoundError(f"CHeck not found at {response.request.url}")
 
         if response.status_code == 400:
             raise BadAPIRequestError(
                 f"Bad request when requesting {response.request.url}. {response.text}"
+            )
+
+        return response
+
+    @staticmethod
+    def check_ping_response(response: Response) -> Response:
+        """Checks a healthchecks.io ping response.
+
+        Args:
+            response (Response): a response from the healthchecks.io api
+
+        Raises:
+            HCAPIAuthError: Raised when status_code == 401 or 403
+            HCAPIError: Raised when status_code is 5xx
+            CheckNotFoundError: Raised when status_code is 404 or response text has "not found" in it
+            BadAPIRequestError: Raised when status_code is 400
+            HCAPIRateLimitError: Raised when status code is 429 or response text has "rate limited" in it
+            NonUniqueSlugError: Raused when status code is 409.
+
+        Returns:
+            Response: the passed in response object
+        """
+        if response.status_code == 401 or response.status_code == 403:
+            raise HCAPIAuthError("Auth failure when pinging")
+
+        if str(response.status_code).startswith("5"):
+            raise HCAPIError(
+                f"Error when reaching out to HC API at {response.request.url}. "
+                f"Status Code {response.status_code}. Response {response.text}"
+            )
+
+        # ping api docs say it can return a 200 with not found for a not found check.
+        # in my testing, its always a 404, but this will cover what the docs say
+        # https://healthchecks.io/docs/http_api/
+        if response.status_code == 404 or "not found" in response.text:
+            raise CheckNotFoundError(f"CHeck not found at {response.request.url}")
+
+        if "rate limited" in response.text or response.status_code == 429:
+            raise HCAPIRateLimitError(f"Rate limited on {response.request.url}")
+
+        if response.status_code == 400:
+            raise BadAPIRequestError(
+                f"Bad request when requesting {response.request.url}. {response.text}"
+            )
+
+        if response.status_code == 409:
+            raise NonUniqueSlugError(
+                f"Bad request, slug conflict {response.request.url}. {response.text}"
             )
 
         return response
