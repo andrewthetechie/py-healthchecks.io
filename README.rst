@@ -19,9 +19,9 @@ Py Healthchecks.Io
 .. |License| image:: https://img.shields.io/pypi/l/py-healthchecks.io
    :target: https://opensource.org/licenses/MIT
    :alt: License
-.. |Read the Docs| image:: https://img.shields.io/readthedocs/py-healthchecks.io/latest.svg?label=Read%20the%20Docs
-   :target: https://py-healthchecks.io.readthedocs.io/
-   :alt: Read the documentation at https://py-healthchecks.io.readthedocs.io/
+.. |Read the Docs| image:: https://img.shields.io/readthedocs/py-healthchecksio/latest.svg?label=Read%20the%20Docs
+   :target: https://py-healthchecksio.readthedocs.io/en/latest/
+   :alt: Read the documentation at https://py-healthchecksio.readthedocs.io/en/latest/
 .. |Tests| image:: https://github.com/andrewthetechie/py-healthchecks.io/workflows/Tests/badge.svg
    :target: https://github.com/andrewthetechie/py-healthchecks.io/actions?workflow=Tests
    :alt: Tests
