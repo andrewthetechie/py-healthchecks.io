@@ -32,7 +32,7 @@ If you are using a self-hosted healthchecks instance, you can set the api url wh
 Creating a new Check
 ^^^^^^^^^^^^^^^^^^^^
 
-... code-block:: python
+.. code-block:: python
 
     from healthchecks_io import Client, CheckCreate
 
@@ -44,7 +44,7 @@ Creating a new Check
 Getting a Check
 ^^^^^^^^^^^^^^^
 
-... code-block:: python
+.. code-block:: python
 
     from healthchecks_io import Client
 
@@ -56,7 +56,7 @@ Getting a Check
 Pinging a Check
 ^^^^^^^^^^^^^^^
 
-... code-block:: python
+.. code-block:: python
     from healthchecks_io import Client
 
     client = Client(api_key="myapikey")
@@ -70,7 +70,7 @@ If you want to use the client in an async program, use AsyncClient instead of Cl
 
 
 
-... code-block:: python
+.. code-block:: python
 
     from healthchecks_io import AsyncClient, CheckCreate
 
