@@ -8,7 +8,7 @@ from typing import Tuple
 from httpx import AsyncClient as HTTPXAsyncClient
 
 from ._abstract import AbstractClient
-from healthchecks_io import VERSION
+from healthchecks_io import __version__ as client_version
 from healthchecks_io.schemas import Badges
 from healthchecks_io.schemas import Check
 from healthchecks_io.schemas import CheckCreate
@@ -51,7 +51,9 @@ class AsyncClient(AbstractClient):
             api_version=api_version,
         )
         self._client.headers["X-Api-Key"] = self._api_key
-        self._client.headers["user-agent"] = f"py-healthchecks.io-async/{VERSION}"
+        self._client.headers[
+            "user-agent"
+        ] = f"py-healthchecks.io-async/{client_version}"
         self._client.headers["Content-type"] = "application/json"
 
     def _finalizer_method(self) -> None:

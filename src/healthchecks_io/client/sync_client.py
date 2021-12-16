@@ -7,7 +7,7 @@ from typing import Tuple
 from httpx import Client as HTTPXClient
 
 from ._abstract import AbstractClient
-from healthchecks_io import VERSION
+from healthchecks_io import __version__ as client_version
 from healthchecks_io.schemas import badges
 from healthchecks_io.schemas import Check
 from healthchecks_io.schemas import CheckCreate
@@ -47,7 +47,7 @@ class Client(AbstractClient):
             api_version=api_version,
         )
         self._client.headers["X-Api-Key"] = self._api_key
-        self._client.headers["user-agent"] = f"py-healthchecks.io/{VERSION}"
+        self._client.headers["user-agent"] = f"py-healthchecks.io/{client_version}"
         self._client.headers["Content-type"] = "application/json"
 
     def _finalizer_method(self) -> None:
