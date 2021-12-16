@@ -9,9 +9,12 @@ from httpx import AsyncClient as HTTPXAsyncClient
 
 from ._abstract import AbstractClient
 from healthchecks_io import VERSION
-from healthchecks_io.schemas import badges
-from healthchecks_io.schemas import checks
-from healthchecks_io.schemas import integrations
+from healthchecks_io.schemas import Badges
+from healthchecks_io.schemas import Check
+from healthchecks_io.schemas import CheckCreate
+from healthchecks_io.schemas import CheckPings
+from healthchecks_io.schemas import CheckStatuses
+from healthchecks_io.schemas import Integration
 
 
 class AsyncClient(AbstractClient):
@@ -59,7 +62,47 @@ class AsyncClient(AbstractClient):
         """Finalizer coroutine that closes our client connections."""
         await self._client.aclose()
 
-    async def get_checks(self, tags: Optional[List[str]] = None) -> List[checks.Check]:
+    async def create_check(self, new_check: CheckCreate) -> Check:
+        """Creates a new check and returns it.
+
+        With this API call, you can create both Simple and Cron checks:
+        * To create a Simple check, specify the timeout parameter.
+        * To create a Cron check, specify the schedule and tz parameters.
+
+        Args:
+            new_check (CheckCreate): New check you are wanting to create
+
+        Returns:
+            Check: check that was just created
+        """
+        request_url = self._get_api_request_url("checks/")
+        response = self.check_response(
+            await self._client.post(request_url, json=new_check.dict())
+        )
+        return Check.from_api_result(response.json())
+
+    async def update_check(self, uuid: str, update_check: CheckCreate) -> Check:
+        """Updates an existing check.
+
+        If you omit any parameter in update_check, Healthchecks.io will leave
+        its value unchanged.
+
+        Args:
+            uuid (str): UUID for the check to update
+            update_check (CheckCreate): Check values you want to update
+
+        Returns:
+            Check: check that was just updated
+        """
+        request_url = self._get_api_request_url(f"checks/{uuid}")
+        response = self.check_response(
+            await self._client.post(
+                request_url, json=update_check.dict(exclude_unset=True)
+            )
+        )
+        return Check.from_api_result(response.json())
+
+    async def get_checks(self, tags: Optional[List[str]] = None) -> List[Check]:
         """Get a list of checks from the healthchecks api.
 
         Args:
@@ -73,7 +116,7 @@ class AsyncClient(AbstractClient):
 
 
         Returns:
-            List[checks.Check]: [description]
+            List[Check]: [description]
         """
         request_url = self._get_api_request_url("checks/")
         if tags is not None:
@@ -85,11 +128,11 @@ class AsyncClient(AbstractClient):
         response = self.check_response(await self._client.get(request_url))
 
         return [
-            checks.Check.from_api_result(check_data)
+            Check.from_api_result(check_data)
             for check_data in response.json()["checks"]
         ]
 
-    async def get_check(self, check_id: str) -> checks.Check:
+    async def get_check(self, check_id: str) -> Check:
         """Get a single check by id.
 
         check_id can either be a check uuid if using a read/write api key
@@ -99,7 +142,7 @@ class AsyncClient(AbstractClient):
             check_id (str): check's uuid or unique id
 
         Returns:
-            checks.Check: the check
+            Check: the check
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -111,9 +154,9 @@ class AsyncClient(AbstractClient):
         """
         request_url = self._get_api_request_url(f"checks/{check_id}")
         response = self.check_response(await self._client.get(request_url))
-        return checks.Check.from_api_result(response.json())
+        return Check.from_api_result(response.json())
 
-    async def pause_check(self, check_id: str) -> checks.Check:
+    async def pause_check(self, check_id: str) -> Check:
         """Disables monitoring for a check without removing it.
 
         The check goes into a "paused" state.
@@ -125,7 +168,7 @@ class AsyncClient(AbstractClient):
             check_id (str): check's uuid
 
         Returns:
-            checks.Check: the check just paused
+            Check: the check just paused
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -135,9 +178,9 @@ class AsyncClient(AbstractClient):
         """
         request_url = self._get_api_request_url(f"checks/{check_id}/pause")
         response = self.check_response(await self._client.post(request_url, data={}))
-        return checks.Check.from_api_result(response.json())
+        return Check.from_api_result(response.json())
 
-    async def delete_check(self, check_id: str) -> checks.Check:
+    async def delete_check(self, check_id: str) -> Check:
         """Permanently deletes the check from the user's account.
 
         check_id must be a uuid, not a unique id
@@ -146,7 +189,7 @@ class AsyncClient(AbstractClient):
             check_id (str): check's uuid
 
         Returns:
-            checks.Check: the check just deleted
+            Check: the check just deleted
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -157,9 +200,9 @@ class AsyncClient(AbstractClient):
         """
         request_url = self._get_api_request_url(f"checks/{check_id}")
         response = self.check_response(await self._client.delete(request_url))
-        return checks.Check.from_api_result(response.json())
+        return Check.from_api_result(response.json())
 
-    async def get_check_pings(self, check_id: str) -> List[checks.CheckPings]:
+    async def get_check_pings(self, check_id: str) -> List[CheckPings]:
         """Returns a list of pings this check has received.
 
         This endpoint returns pings in reverse order (most recent first),
@@ -170,7 +213,7 @@ class AsyncClient(AbstractClient):
             check_id (str): check's uuid
 
         Returns:
-            List[checks.CheckPings]: list of pings this check has received
+            List[CheckPings]: list of pings this check has received
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -183,7 +226,7 @@ class AsyncClient(AbstractClient):
         request_url = self._get_api_request_url(f"checks/{check_id}/pings/")
         response = self.check_response(await self._client.get(request_url))
         return [
-            checks.CheckPings.from_api_result(check_data)
+            CheckPings.from_api_result(check_data)
             for check_data in response.json()["pings"]
         ]
 
@@ -193,7 +236,7 @@ class AsyncClient(AbstractClient):
         seconds: Optional[int] = None,
         start: Optional[int] = None,
         end: Optional[int] = None,
-    ) -> List[checks.CheckStatuses]:
+    ) -> List[CheckStatuses]:
         """Returns a list of "flips" this check has experienced.
 
         A flip is a change of status (from "down" to "up," or from "up" to "down").
@@ -213,7 +256,7 @@ class AsyncClient(AbstractClient):
             end (Optional[int], optional): Returns flips that are older than the specified UNIX timestamp.. Defaults to None.
 
         Returns:
-            List[checks.CheckStatuses]: List of status flips for this check
+            List[CheckStatuses]: List of status flips for this check
 
         """
         params = dict()
@@ -226,9 +269,9 @@ class AsyncClient(AbstractClient):
 
         request_url = self._get_api_request_url(f"checks/{check_id}/flips/", params)
         response = self.check_response(await self._client.get(request_url))
-        return [checks.CheckStatuses(**status_data) for status_data in response.json()]
+        return [CheckStatuses(**status_data) for status_data in response.json()]
 
-    async def get_integrations(self) -> List[Optional[integrations.Integration]]:
+    async def get_integrations(self) -> List[Optional[Integration]]:
         """Returns a list of integrations belonging to the project.
 
         Raises:
@@ -237,17 +280,17 @@ class AsyncClient(AbstractClient):
             HCAPIRateLimitError: Raised when status code is 429
 
         Returns:
-            List[Optional[integrations.Integration]]: List of integrations for the project
+            List[Optional[Integration]]: List of integrations for the project
 
         """
         request_url = self._get_api_request_url("channels/")
         response = self.check_response(await self._client.get(request_url))
         return [
-            integrations.Integration.from_api_result(integration_dict)
+            Integration.from_api_result(integration_dict)
             for integration_dict in response.json()["channels"]
         ]
 
-    async def get_badges(self) -> Dict[str, badges.Badges]:
+    async def get_badges(self) -> Dict[str, Badges]:
         """Returns a dict of all tags in the project, with badge URLs for each tag.
 
         Healthchecks.io provides badges in a few different formats:
@@ -268,12 +311,12 @@ class AsyncClient(AbstractClient):
             HCAPIRateLimitError: Raised when status code is 429
 
         Returns:
-            Dict[str, badges.Badges]: Dictionary of all tags in the project with badges
+            Dict[str, Badges]: Dictionary of all tags in the project with badges
         """
         request_url = self._get_api_request_url("badges/")
         response = self.check_response(await self._client.get(request_url))
         return {
-            key: badges.Badges.from_api_result(item)
+            key: Badges.from_api_result(item)
             for key, item in response.json()["badges"].items()
         }
 

@@ -163,6 +163,73 @@ class CheckCreate(BaseModel):
         return value
 
 
+class CheckUpdate(CheckCreate):
+    """Pydantic object for updating a check."""
+
+    name: Optional[str] = Field(None, description="Name of the check")
+    tags: Optional[str] = Field(
+        None, description="String separated list of tags to apply"
+    )
+    timeout: Optional[int] = Field(
+        None,
+        description="The expected period of this check in seconds.",
+        gte=60,
+        lte=31536000,
+    )
+    grace: Optional[int] = Field(
+        None,
+        description="The grace period for this check in seconds.",
+        gte=60,
+        lte=31536000,
+    )
+    schedule: Optional[str] = Field(
+        None,
+        description="A cron expression defining this check's schedule. "
+        "If you specify both timeout and schedule parameters, "
+        "Healthchecks.io will create a Cron check and ignore the "
+        "timeout value.",
+    )
+    tz: Optional[str] = Field(
+        None,
+        description="Server's timezone. This setting only has an effect "
+        "in combination with the schedule parameter.",
+    )
+    manual_resume: Optional[bool] = Field(
+        None,
+        description="Controls whether a paused check automatically resumes "
+        "when pinged (the default) or not. If set to false, a paused "
+        "check will leave the paused state when it receives a ping. "
+        "If set to true, a paused check will ignore pings and stay "
+        "paused until you manually resume it from the web dashboard.",
+    )
+    methods: Optional[str] = Field(
+        None,
+        description="Specifies the allowed HTTP methods for making "
+        "ping requests. Must be one of the two values: an empty "
+        "string or POST. Set this field to an empty string to "
+        "allow HEAD, GET, and POST requests. Set this field to "
+        "POST to allow only POST requests.",
+    )
+    channels: Optional[str] = Field(
+        None,
+        description="By default, this API call assigns no integrations"
+        "to the newly created check. By default, this API call "
+        "assigns no integrations to the newly created check. "
+        "To assign specific integrations, use a comma-separated list "
+        "of integration UUIDs.",
+    )
+    unique: Optional[List[Optional[str]]] = Field(
+        None,
+        description="Enables upsert functionality. Before creating a check, "
+        "Healthchecks.io looks for existing checks, filtered by fields listed "
+        "in unique. If Healthchecks.io does not find a matching check, it "
+        "creates a new check and returns it with the HTTP status code 201 "
+        "If Healthchecks.io finds a matching check, it updates the existing "
+        "check and returns it with HTTP status code 200. The accepted values "
+        "for the unique field are name, tags, timeout, and grace.",
+    )
+
+
 class CheckPings(BaseModel):
     """A Pydantic schema for a check's Pings."""
 

@@ -9,6 +9,8 @@ from httpx import Client as HTTPXClient
 from ._abstract import AbstractClient
 from healthchecks_io import VERSION
 from healthchecks_io.schemas import badges
+from healthchecks_io.schemas import Check
+from healthchecks_io.schemas import CheckCreate
 from healthchecks_io.schemas import checks
 from healthchecks_io.schemas import integrations
 
@@ -101,6 +103,50 @@ class Client(AbstractClient):
         request_url = self._get_api_request_url(f"checks/{check_id}")
         response = self.check_response(self._client.get(request_url))
         return checks.Check.from_api_result(response.json())
+
+    def create_check(self, new_check: CheckCreate) -> Check:
+        """Creates a new check and returns it.
+
+        With this API call, you can create both Simple and Cron checks:
+        * To create a Simple check, specify the timeout parameter.
+        * To create a Cron check, specify the schedule and tz parameters.
+
+        Args:
+            new_check (CheckCreate): New check you are wanting to create
+
+        Returns:
+            Check: check that was just created
+        """
+        request_url = self._get_api_request_url("checks/")
+        response = self.check_response(
+            self._client.post(request_url, json=new_check.dict())
+        )
+        return Check.from_api_result(response.json())
+
+    def update_check(self, uuid: str, update_check: CheckCreate) -> Check:
+        """Updates an existing check.
+
+        If you omit any parameter in update_check, Healthchecks.io will leave
+        its value unchanged.
+
+
+
+        With this API call, you can create both Simple and Cron checks:
+        * To create a Simple check, specify the timeout parameter.
+        * To create a Cron check, specify the schedule and tz parameters.
+
+        Args:
+            uuid (str): UUID for the check to update
+            update_check (CheckCreate): Check values you want to update
+
+        Returns:
+            Check: check that was just updated
+        """
+        request_url = self._get_api_request_url(f"checks/{uuid}")
+        response = self.check_response(
+            self._client.post(request_url, json=update_check.dict(exclude_unset=True))
+        )
+        return Check.from_api_result(response.json())
 
     def pause_check(self, check_id: str) -> checks.Check:
         """Disables monitoring for a check without removing it.

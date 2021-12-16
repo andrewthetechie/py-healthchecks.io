@@ -5,11 +5,73 @@ import respx
 from httpx import Client as HTTPXClient
 from httpx import Response
 
+from healthchecks_io import CheckCreate
+from healthchecks_io import CheckUpdate
 from healthchecks_io import Client
 from healthchecks_io.client.exceptions import BadAPIRequestError
 from healthchecks_io.client.exceptions import CheckNotFoundError
 from healthchecks_io.client.exceptions import HCAPIAuthError
 from healthchecks_io.client.exceptions import HCAPIError
+
+
+@pytest.mark.respx
+def test_create_check_200(fake_check_api_result, respx_mock, test_client):
+    checks_url = urljoin(test_client._api_url, "checks/")
+    respx_mock.post(checks_url).mock(
+        return_value=Response(
+            status_code=200,
+            json={
+                "channels": "",
+                "desc": "",
+                "grace": 60,
+                "last_ping": None,
+                "n_pings": 0,
+                "name": "Backups",
+                "slug": "backups",
+                "next_ping": None,
+                "manual_resume": False,
+                "methods": "",
+                "pause_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc/pause",
+                "ping_url": "https://hc-ping.com/f618072a-7bde-4eee-af63-71a77c5723bc",
+                "status": "new",
+                "tags": "prod www",
+                "timeout": 3600,
+                "update_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc",
+            },
+        )
+    )
+    check = test_client.create_check(CheckCreate(name="test", tags="test", desc="test"))
+    assert check.name == "Backups"
+
+
+@pytest.mark.respx
+def test_update_check_200(fake_check_api_result, respx_mock, test_client):
+    checks_url = urljoin(test_client._api_url, "checks/test")
+    respx_mock.post(checks_url).mock(
+        return_value=Response(
+            status_code=200,
+            json={
+                "channels": "",
+                "desc": "",
+                "grace": 60,
+                "last_ping": None,
+                "n_pings": 0,
+                "name": "Backups",
+                "slug": "backups",
+                "next_ping": None,
+                "manual_resume": False,
+                "methods": "",
+                "pause_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc/pause",
+                "ping_url": "https://hc-ping.com/f618072a-7bde-4eee-af63-71a77c5723bc",
+                "status": "new",
+                "tags": "prod www",
+                "timeout": 3600,
+                "update_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc",
+            },
+        )
+    )
+    check = test_client.update_check("test", CheckUpdate(name="test", desc="test"))
+    assert check.name == "Backups"
 
 
 @pytest.mark.respx

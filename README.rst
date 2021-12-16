@@ -35,18 +35,22 @@ Py Healthchecks.Io
    :target: https://github.com/psf/black
    :alt: Black
 
-A python client for healthchecks.io. Supports the management api and ping api
+A python client for healthchecks.io. Supports the management api and ping api.
 
 Features
 --------
 
-* TODO
+* Sync and Async clients based on HTTPX
+* Supports the management api and the ping api
+* Supports Healthchecks.io SAAS and self-hosted instances
 
 
 Requirements
 ------------
 
-* TODO
+* httpx
+* pytz
+* pydantic
 
 
 Installation
@@ -62,7 +66,7 @@ You can install *Py Healthchecks.Io* via pip_ from PyPI_:
 Usage
 -----
 
-Please see the `Command-line Reference <Usage_>`_ for details.
+Please see the `Usage <Usage_>`_ for details.
 
 
 Contributing
@@ -100,4 +104,4 @@ This project was generated from `@cjolowicz`_'s `Hypermodern Python Cookiecutter
 .. _pip: https://pip.pypa.io/
 .. github-only
 .. _Contributor Guide: CONTRIBUTING.rst
-.. _Usage: https://py-healthchecks.io.readthedocs.io/en/latest/usage.html
+.. _Usage: https://py-healthchecksio.readthedocs.io/en/latest/usage.html
