@@ -60,7 +60,7 @@ You can install *Py Healthchecks.Io* via pip_ from PyPI_:
 
 .. code:: console
 
-   $ pip install py-healthchecks.io
+   $ pip install healthchecks-io
 
 
 Usage
