@@ -7,14 +7,14 @@ Py Healthchecks.Io
 
 |pre-commit| |Black|
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/py-healthchecks.io.svg
-   :target: https://pypi.org/project/py-healthchecks.io/
+.. |PyPI| image:: https://img.shields.io/pypi/v/py-healthchecksio.svg
+   :target: https://pypi.org/project/py-healthchecksio/
    :alt: PyPI
-.. |Status| image:: https://img.shields.io/pypi/status/py-healthchecks.io.svg
-   :target: https://pypi.org/project/py-healthchecks.io/
+.. |Status| image:: https://img.shields.io/pypi/status/py-healthchecksio.svg
+   :target: https://pypi.org/project/py-healthchecksio/
    :alt: Status
-.. |Python Version| image:: https://img.shields.io/pypi/pyversions/py-healthchecks.io
-   :target: https://pypi.org/project/py-healthchecks.io
+.. |Python Version| image:: https://img.shields.io/pypi/pyversions/py-healthchecksio
+   :target: https://pypi.org/project/py-healthchecksio
    :alt: Python Version
 .. |License| image:: https://img.shields.io/pypi/l/py-healthchecks.io
    :target: https://opensource.org/licenses/MIT
