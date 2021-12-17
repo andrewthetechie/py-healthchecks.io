@@ -2,7 +2,7 @@
 name = "healthchecks_io"
 version = "0.0.0"
 description = "A python client package for Healthchecks.io API"
-authors = ["Andrew Herrington <andrew@💻.kz>"]
+authors = ["Andrew Herrington <andrew.the.techie@gmail.com>"]
 license = "MIT"
 readme = "README.rst"
 homepage = "https://github.com/andrewthetechie/py-healthchecks.io"
