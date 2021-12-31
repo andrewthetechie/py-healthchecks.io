@@ -3,6 +3,23 @@ Usage
 
 This package implements the Healthchecks.io Management and Ping APIs as documented here https://healthchecks.io/docs/api/.
 
+Context Manager
+---------------
+
+Either the Client or AsyncClient can be used as a ContextManager (or Async Context Manager)
+
+.. code-block:: pythong
+
+    from healthchecks_io import AsyncClient, CheckCreate
+
+    async with AsyncClient(api_key="myapikey") as client:
+        check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+    print(check)
+
+This is probably the easiest way to use the Clients for one-off scripts. If you do not need to keep a client open for multiple requests, just use
+the context manager.
+
+
 Sync
 ----
 
