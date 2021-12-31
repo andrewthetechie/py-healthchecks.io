@@ -1,9 +1,11 @@
 """An async healthchecks.io client."""
 import asyncio
+from types import TracebackType
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Type
 
 from httpx import AsyncClient as HTTPXAsyncClient
 
@@ -55,6 +57,23 @@ class AsyncClient(AbstractClient):
             "user-agent"
         ] = f"py-healthchecks.io-async/{client_version}"
         self._client.headers["Content-type"] = "application/json"
+
+    async def __aenter__(self) -> "AsyncClient":
+        """Context manager entrance.
+
+        Returns:
+            AsyncClient: returns this client as a context manager
+        """
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        await self._afinalizer_method()
 
     def _finalizer_method(self) -> None:
         """Calls _afinalizer_method from a sync context to work with weakref.finalizer."""
@@ -322,7 +341,9 @@ class AsyncClient(AbstractClient):
             for key, item in response.json()["badges"].items()
         }
 
-    async def success_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    async def success_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that a job has completed successfully.
 
         Can also be used to indicate a continuously running process is still running and healthy.
@@ -338,6 +359,7 @@ class AsyncClient(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str):  Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to "".
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -352,10 +374,14 @@ class AsyncClient(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "")
-        response = self.check_ping_response(await self._client.get(ping_url))
+        response = self.check_ping_response(
+            await self._client.post(ping_url, content=data)
+        )
         return (True if response.status_code == 200 else False, response.text)
 
-    async def start_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    async def start_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Sends a "job has started!" message to Healthchecks.io.
 
         Sending a "start" signal is optional, but it enables a few extra features:
@@ -373,6 +399,7 @@ class AsyncClient(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to "".
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -387,10 +414,14 @@ class AsyncClient(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "/start")
-        response = self.check_ping_response(await self._client.get(ping_url))
+        response = self.check_ping_response(
+            await self._client.post(ping_url, content=data)
+        )
         return (True if response.status_code == 200 else False, response.text)
 
-    async def fail_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    async def fail_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
@@ -406,6 +437,7 @@ class AsyncClient(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to "".
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -420,11 +452,13 @@ class AsyncClient(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "/fail")
-        response = self.check_ping_response(await self._client.get(ping_url))
+        response = self.check_ping_response(
+            await self._client.post(ping_url, content=data)
+        )
         return (True if response.status_code == 200 else False, response.text)
 
     async def exit_code_ping(
-        self, exit_code: int, uuid: str = "", slug: str = ""
+        self, exit_code: int, uuid: str = "", slug: str = "", data: str = ""
     ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
@@ -442,6 +476,7 @@ class AsyncClient(AbstractClient):
             exit_code (int): Exit code to sent, int from 0 to 255
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to "".
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -456,5 +491,7 @@ class AsyncClient(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, f"/{exit_code}")
-        response = self.check_ping_response(await self._client.get(ping_url))
+        response = self.check_ping_response(
+            await self._client.post(ping_url, content=data)
+        )
         return (True if response.status_code == 200 else False, response.text)

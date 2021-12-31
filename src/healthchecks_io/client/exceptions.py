@@ -35,3 +35,15 @@ class NonUniqueSlugError(HCAPIError):
     """Thrown when the api returns a 409 when pinging."""
 
     ...
+
+
+class WrongClientError(HCAPIError):
+    """Thrown when trying to use a CheckTrap with the wrong client type."""
+
+    ...
+
+
+class PingFailedError(HCAPIError):
+    """Thrown when a ping fails."""
+
+    ...

@@ -15,6 +15,39 @@ from healthchecks_io.client.exceptions import HCAPIError
 
 
 @pytest.mark.respx
+def test_create_check_200_context_manager(
+    fake_check_api_result, respx_mock, test_client
+):
+    checks_url = urljoin(test_client._api_url, "checks/")
+    respx_mock.post(checks_url).mock(
+        return_value=Response(
+            status_code=200,
+            json={
+                "channels": "",
+                "desc": "",
+                "grace": 60,
+                "last_ping": None,
+                "n_pings": 0,
+                "name": "Backups",
+                "slug": "backups",
+                "next_ping": None,
+                "manual_resume": False,
+                "methods": "",
+                "pause_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc/pause",
+                "ping_url": "https://hc-ping.com/f618072a-7bde-4eee-af63-71a77c5723bc",
+                "status": "new",
+                "tags": "prod www",
+                "timeout": 3600,
+                "update_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc",
+            },
+        )
+    )
+    with test_client as tc:
+        check = tc.create_check(CheckCreate(name="test", tags="test", desc="test"))
+    assert check.name == "Backups"
+
+
+@pytest.mark.respx
 def test_create_check_200(fake_check_api_result, respx_mock, test_client):
     checks_url = urljoin(test_client._api_url, "checks/")
     respx_mock.post(checks_url).mock(
@@ -325,7 +358,7 @@ ping_test_parameters = [
 )
 def test_success_ping(respx_mocker, tc, url, ping_method, method_kwargs):
     channels_url = urljoin(tc._ping_url, url)
-    respx_mocker.get(channels_url).mock(
+    respx_mocker.post(channels_url).mock(
         return_value=Response(status_code=200, text="OK")
     )
     ping_method = getattr(tc, ping_method)
