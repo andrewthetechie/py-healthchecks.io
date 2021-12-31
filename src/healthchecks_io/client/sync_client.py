@@ -324,7 +324,9 @@ class Client(AbstractClient):
             for key, item in response.json()["badges"].items()
         }
 
-    def success_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    def success_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that a job has completed successfully.
 
         Can also be used to indicate a continuously running process is still running and healthy.
@@ -340,6 +342,7 @@ class Client(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to ""
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -354,10 +357,12 @@ class Client(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "")
-        response = self.check_ping_response(self._client.get(ping_url))
+        response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    def start_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    def start_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Sends a "job has started!" message to Healthchecks.io.
 
         Sending a "start" signal is optional, but it enables a few extra features:
@@ -375,6 +380,7 @@ class Client(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to ""
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -389,10 +395,12 @@ class Client(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "/start")
-        response = self.check_ping_response(self._client.get(ping_url))
+        response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    def fail_ping(self, uuid: str = "", slug: str = "") -> Tuple[bool, str]:
+    def fail_ping(
+        self, uuid: str = "", slug: str = "", data: str = ""
+    ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
@@ -408,6 +416,7 @@ class Client(AbstractClient):
         Args:
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to ""
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -422,11 +431,11 @@ class Client(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, "/fail")
-        response = self.check_ping_response(self._client.get(ping_url))
+        response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
     def exit_code_ping(
-        self, exit_code: int, uuid: str = "", slug: str = ""
+        self, exit_code: int, uuid: str = "", slug: str = "", data: str = ""
     ) -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
@@ -444,6 +453,7 @@ class Client(AbstractClient):
             exit_code (int): Exit code to sent, int from 0 to 255
             uuid (str): Check's UUID. Defaults to "".
             slug (str): Check's Slug. Defaults to "".
+            data (str): Text data to append to this check. Defaults to ""
 
         Raises:
             HCAPIAuthError: Raised when status_code == 401 or 403
@@ -458,5 +468,5 @@ class Client(AbstractClient):
             Tuple[bool, str]: success (true or false) and the response text
         """
         ping_url = self._get_ping_url(uuid, slug, f"/{exit_code}")
-        response = self.check_ping_response(self._client.get(ping_url))
+        response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)

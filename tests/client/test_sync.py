@@ -358,7 +358,7 @@ ping_test_parameters = [
 )
 def test_success_ping(respx_mocker, tc, url, ping_method, method_kwargs):
     channels_url = urljoin(tc._ping_url, url)
-    respx_mocker.get(channels_url).mock(
+    respx_mocker.post(channels_url).mock(
         return_value=Response(status_code=200, text="OK")
     )
     ping_method = getattr(tc, ping_method)
