@@ -1,8 +1,10 @@
 """An async healthchecks.io client."""
+from types import TracebackType
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Type
 
 from httpx import Client as HTTPXClient
 
@@ -49,6 +51,23 @@ class Client(AbstractClient):
         self._client.headers["X-Api-Key"] = self._api_key
         self._client.headers["user-agent"] = f"py-healthchecks.io/{client_version}"
         self._client.headers["Content-type"] = "application/json"
+
+    def __enter__(self) -> "Client":
+        """Context manager entrance.
+
+        Returns:
+            Client: returns this client as a context manager
+        """
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        self._finalizer_method()
 
     def _finalizer_method(self) -> None:
         """Closes the httpx client."""

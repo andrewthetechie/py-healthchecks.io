@@ -1,9 +1,11 @@
 """An async healthchecks.io client."""
 import asyncio
+from types import TracebackType
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Type
 
 from httpx import AsyncClient as HTTPXAsyncClient
 
@@ -55,6 +57,23 @@ class AsyncClient(AbstractClient):
             "user-agent"
         ] = f"py-healthchecks.io-async/{client_version}"
         self._client.headers["Content-type"] = "application/json"
+
+    async def __aenter__(self) -> "AsyncClient":
+        """Context manager entrance.
+
+        Returns:
+            AsyncClient: returns this client as a context manager
+        """
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        await self._afinalizer_method()
 
     def _finalizer_method(self) -> None:
         """Calls _afinalizer_method from a sync context to work with weakref.finalizer."""

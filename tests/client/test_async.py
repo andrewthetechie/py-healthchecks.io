@@ -16,6 +16,42 @@ from healthchecks_io.client.exceptions import HCAPIError
 
 @pytest.mark.asyncio
 @pytest.mark.respx
+async def test_acreate_check_200_context_manager(
+    fake_check_api_result, respx_mock, test_async_client
+):
+    checks_url = urljoin(test_async_client._api_url, "checks/")
+    respx_mock.post(checks_url).mock(
+        return_value=Response(
+            status_code=200,
+            json={
+                "channels": "",
+                "desc": "",
+                "grace": 60,
+                "last_ping": None,
+                "n_pings": 0,
+                "name": "Backups",
+                "slug": "backups",
+                "next_ping": None,
+                "manual_resume": False,
+                "methods": "",
+                "pause_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc/pause",
+                "ping_url": "https://hc-ping.com/f618072a-7bde-4eee-af63-71a77c5723bc",
+                "status": "new",
+                "tags": "prod www",
+                "timeout": 3600,
+                "update_url": "https://healthchecks.io/api/v1/checks/f618072a-7bde-4eee-af63-71a77c5723bc",
+            },
+        )
+    )
+    async with test_async_client as test_client:
+        check = await test_client.create_check(
+            CheckCreate(name="test", tags="test", desc="test")
+        )
+    assert check.name == "Backups"
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx
 async def test_acreate_check_200(fake_check_api_result, respx_mock, test_async_client):
     checks_url = urljoin(test_async_client._api_url, "checks/")
     respx_mock.post(checks_url).mock(
