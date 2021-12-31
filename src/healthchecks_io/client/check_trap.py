@@ -153,13 +153,14 @@ class CheckTrap:
             Optional[bool]: self.suppress_exceptions, if true will not raise any exceptions
         """
         if exc_type is None:
-            await self.client.success_ping(
+            # ignore typing, if we've gotten here we know its an async client
+            await self.client.success_ping(  # type: ignore
                 self.uuid, self.slug, data="\n".join(self.log_lines)
             )
         else:
             self.add_log(str(exc))
             self.add_log(str(traceback))
-            await self.client.fail_ping(
+            await self.client.fail_ping(  # type: ignore
                 self.uuid, self.slug, data="\n".join(self.log_lines)
             )
         return self.suppress_exceptions

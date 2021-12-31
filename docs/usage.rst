@@ -8,7 +8,7 @@ Context Manager
 
 Either the Client or AsyncClient can be used as a ContextManager (or Async Context Manager)
 
-.. code-block:: pythong
+.. code-block:: python
 
     from healthchecks_io import AsyncClient, CheckCreate
 
@@ -82,6 +82,7 @@ Pinging a Check
 ^^^^^^^^^^^^^^^
 
 .. code-block:: python
+
     from healthchecks_io import Client
 
     client = Client(api_key="myapikey")
