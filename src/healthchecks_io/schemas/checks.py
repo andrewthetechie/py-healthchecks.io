@@ -38,7 +38,7 @@ class Check(BaseModel):
     update_url: Optional[str]
     pause_url: Optional[str]
     channels: Optional[str]
-    timeout: int
+    timeout: Optional[int]
     uuid: Optional[str]
 
     @validator("uuid", always=True)
