@@ -98,7 +98,7 @@ class AsyncClient(AbstractClient):
         """
         request_url = self._get_api_request_url("checks/")
         response = self.check_response(
-            await self._client.post(request_url, json=new_check.dict())
+            await self._client.post(request_url, json=new_check.dict(exclude_none=True))
         )
         return Check.from_api_result(response.json())
 
@@ -118,7 +118,8 @@ class AsyncClient(AbstractClient):
         request_url = self._get_api_request_url(f"checks/{uuid}")
         response = self.check_response(
             await self._client.post(
-                request_url, json=update_check.dict(exclude_unset=True)
+                request_url,
+                json=update_check.dict(exclude_unset=True, exclude_none=True),
             )
         )
         return Check.from_api_result(response.json())
