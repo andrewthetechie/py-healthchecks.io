@@ -138,7 +138,7 @@ class Client(AbstractClient):
         """
         request_url = self._get_api_request_url("checks/")
         response = self.check_response(
-            self._client.post(request_url, json=new_check.dict())
+            self._client.post(request_url, json=new_check.dict(exclude_none=True))
         )
         return Check.from_api_result(response.json())
 
@@ -163,7 +163,10 @@ class Client(AbstractClient):
         """
         request_url = self._get_api_request_url(f"checks/{uuid}")
         response = self.check_response(
-            self._client.post(request_url, json=update_check.dict(exclude_unset=True))
+            self._client.post(
+                request_url,
+                json=update_check.dict(exclude_unset=True, exclude_none=True),
+            )
         )
         return Check.from_api_result(response.json())
 
