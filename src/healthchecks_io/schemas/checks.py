@@ -83,7 +83,7 @@ class CheckCreate(BaseModel):
         lte=31536000,
     )
     schedule: Optional[str] = Field(
-        "* * * * *",
+        None,
         description="A cron expression defining this check's schedule. "
         "If you specify both timeout and schedule parameters, "
         "Healthchecks.io will create a Cron check and ignore the "
