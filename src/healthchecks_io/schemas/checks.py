@@ -65,11 +65,11 @@ class Check(BaseModel):
 class CheckCreate(BaseModel):
     """Pydantic object for creating a check."""
 
-    name: Optional[str] = Field(..., description="Name of the check")
+    name: Optional[str] = Field("", description="Name of the check")
     tags: Optional[str] = Field(
-        ..., description="String separated list of tags to apply"
+        "", description="String separated list of tags to apply"
     )
-    desc: Optional[str] = Field(..., description="Description of the check")
+    desc: Optional[str] = Field("", description="Description of the check")
     timeout: Optional[int] = Field(
         86400,
         description="The expected period of this check in seconds.",
