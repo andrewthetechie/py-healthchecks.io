@@ -97,13 +97,13 @@ If you want to use the client in an async program, use AsyncClient instead of Cl
 .. code-block:: python
 
     from healthchecks_io import AsyncClient, CheckCreate
-    
+
     async def main():
         client = AsyncClient(api_key="myapikey")
 
         check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2"))
         print(check)
-    
+
     if __name__ == "__main__":
         asyncio.run(main())
 
