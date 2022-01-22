@@ -13,7 +13,7 @@ Either the Client or AsyncClient can be used as a ContextManager (or Async Conte
     from healthchecks_io import AsyncClient, CheckCreate
 
     async with AsyncClient(api_key="myapikey") as client:
-        check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+        check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
     print(check)
 
 This is probably the easiest way to use the Clients for one-off scripts. If you do not need to keep a client open for multiple requests, just use
@@ -63,7 +63,7 @@ Creating a new Check
 
     client = Client(api_key="myapikey")
 
-    check = client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+    check = client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
     print(check)
 
 Getting a Check
@@ -99,11 +99,14 @@ If you want to use the client in an async program, use AsyncClient instead of Cl
 .. code-block:: python
 
     from healthchecks_io import AsyncClient, CheckCreate
+    
+    async def main():
+        client = AsyncClient(api_key="myapikey")
 
-    client = AsyncClient(api_key="myapikey")
-
-    check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
-    print(check)
+        check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
+        print(check)
+    if __name__ == "__main__":
+        asyncio.run(main())
 
 
 CheckTrap
