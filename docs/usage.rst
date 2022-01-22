@@ -10,10 +10,10 @@ Either the Client or AsyncClient can be used as a ContextManager (or Async Conte
 
 .. code-block:: python
 
-    from healthchecks_io import AsyncClient, CheckCreate
+    from healthchecks_io import Client, CheckCreate
 
-    async with AsyncClient(api_key="myapikey") as client:
-        check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
+    with Client(api_key="myapikey") as client:
+        check = client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
     print(check)
 
 This is probably the easiest way to use the Clients for one-off scripts. If you do not need to keep a client open for multiple requests, just use
@@ -94,8 +94,6 @@ Async
 
 If you want to use the client in an async program, use AsyncClient instead of Client
 
-
-
 .. code-block:: python
 
     from healthchecks_io import AsyncClient, CheckCreate
@@ -105,6 +103,7 @@ If you want to use the client in an async program, use AsyncClient instead of Cl
 
         check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2")
         print(check)
+    
     if __name__ == "__main__":
         asyncio.run(main())
 
