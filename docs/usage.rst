@@ -10,10 +10,10 @@ Either the Client or AsyncClient can be used as a ContextManager (or Async Conte
 
 .. code-block:: python
 
-    from healthchecks_io import AsyncClient, CheckCreate
+    from healthchecks_io import Client, CheckCreate
 
-    async with AsyncClient(api_key="myapikey") as client:
-        check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+    with Client(api_key="myapikey") as client:
+        check = client.create_check(CheckCreate(name="New Check", tags="tag1 tag2"))
     print(check)
 
 This is probably the easiest way to use the Clients for one-off scripts. If you do not need to keep a client open for multiple requests, just use
@@ -63,7 +63,7 @@ Creating a new Check
 
     client = Client(api_key="myapikey")
 
-    check = client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+    check = client.create_check(CheckCreate(name="New Check", tags="tag1 tag2"))
     print(check)
 
 Getting a Check
@@ -94,16 +94,19 @@ Async
 
 If you want to use the client in an async program, use AsyncClient instead of Client
 
-
-
 .. code-block:: python
 
+    import asyncio
     from healthchecks_io import AsyncClient, CheckCreate
 
-    client = AsyncClient(api_key="myapikey")
+    async def main():
+        client = AsyncClient(api_key="myapikey")
 
-    check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
-    print(check)
+        check = await client.create_check(CheckCreate(name="New Check", tags="tag1 tag2"))
+        print(check)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
 
 
 CheckTrap
@@ -115,28 +118,30 @@ That's what CheckTrap is for.
 
 .. code-block:: python
 
+    import asyncio
     from healthchecks_io import Client, AsyncClient, CheckCreate, CheckTrap
 
-    client = Client(api_key="myapikey")
+    def run_my_thing_to_monitor():
+        pass
 
-    # create a new check, or use an existing one already with just its uuid.
-    check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
+    async def main(check):
+        client = AsyncClient(ping_key="ping_key")
 
-    with CheckTrap(client, check.uuid):
-        # when entering the context manager, sends a start ping to your check
-        run_my_thing_to_monitor()
+        # works with async too, and the ping api and slugs
+        async with CheckTrap(client, slug=check.slug) as ct:
+            # when entering the context manager, sends a start ping to your check
+            # Add custom logs to what gets sent to healthchecks. Reminder, only the first 10k bytes get saved
+            ct.add_log("My custom log message")
+            run_my_thing_to_monitor()
 
-    # If your method exits without an exception, sends a success ping
-    # If there's an exception, a failure ping will be sent with the exception and traceback
+    if __name__ == "__main__":
+        client = Client(api_key="myapikey")
 
-    client = AsyncClient(ping_key="ping_key")
+        # create a new check, or use an existing one already with just its uuid.
+        check = await client.create_check(CreateCheck(name="New Check", tags="tag1 tag2")
 
-    # works with async too, and the ping api and slugs
-    async with CheckTrap(client, check.slug) as ct:
-        # when entering the context manager, sends a start ping to your check
-        # Add custom logs to what gets sent to healthchecks. Reminder, only the first 10k bytes get saved
-        ct.add_log("My custom log message")
-        run_my_thing_to_monitor()
+        with CheckTrap(client, check.uuid):
+            # when entering the context manager, sends a start ping to your check
+            run_my_thing_to_monitor()
 
-    # If your method exits without an exception, sends a success ping
-    # If there's an exception, a failure ping will be sent with the exception and traceback
+        asyncio.run(main())
