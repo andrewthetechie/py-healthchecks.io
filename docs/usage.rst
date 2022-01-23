@@ -128,7 +128,7 @@ That's what CheckTrap is for.
         client = AsyncClient(ping_key="ping_key")
 
         # works with async too, and the ping api and slugs
-        async with CheckTrap(client, check.slug) as ct:
+        async with CheckTrap(client, slug=check.slug) as ct:
             # when entering the context manager, sends a start ping to your check
             # Add custom logs to what gets sent to healthchecks. Reminder, only the first 10k bytes get saved
             ct.add_log("My custom log message")
