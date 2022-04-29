@@ -24,7 +24,7 @@ croniter = "^1.1.0"
 pytz = ">=2021.3,<2023.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1.1"
+pytest = "^7.1.2"
 coverage = {extras = ["toml"], version = "^6.3"}
 safety = "^1.10.3"
 mypy = "^0.942"
