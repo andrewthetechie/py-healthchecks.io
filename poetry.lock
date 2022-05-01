@@ -1184,7 +1184,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-pytz"
-version = "2021.3.6"
+version = "2021.3.7"
 description = "Typing stubs for pytz"
 category = "dev"
 optional = false
@@ -1265,7 +1265,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "f62dcbfa4cff8c8968418308afb14ac3df6123ffed9523dcb6f292dc71749444"
+content-hash = "a543576b0d6f369c1f50b429c2a4c2b96094e6713673004f48ce6812ca9711e5"
 
 [metadata.files]
 alabaster = [
@@ -1974,8 +1974,8 @@ types-croniter = [
     {file = "types_croniter-1.0.10-py3-none-any.whl", hash = "sha256:3ae500135d4d6ccc5a4e54a4c9b971fcbe98b5f0970ee2987f7ad60e77b3f95f"},
 ]
 types-pytz = [
-    {file = "types-pytz-2021.3.6.tar.gz", hash = "sha256:74547fd90d8d8ab4f1eedf3a344a7d186d97486973895f81221a712e1e2cd993"},
-    {file = "types_pytz-2021.3.6-py3-none-any.whl", hash = "sha256:6805c72d51118923c5bf98633c39593d5b464d2ab49a803440e2d7ab6b8920df"},
+    {file = "types-pytz-2021.3.7.tar.gz", hash = "sha256:11d5ba06268167953ccc4a3eee192c24b42d00d2aef456c160a8798893cb2081"},
+    {file = "types_pytz-2021.3.7-py3-none-any.whl", hash = "sha256:0f67528c1df2017b61a45f2f9cfa2d45b16ce1dc135f09c7d2fd258998aade58"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.0.1-py3-none-any.whl", hash = "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"},
