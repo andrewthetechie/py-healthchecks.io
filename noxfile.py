@@ -7,6 +7,7 @@ from pathlib import Path
 from textwrap import dedent
 
 import nox
+import toml
 
 try:
     from nox_poetry import Session
@@ -43,6 +44,9 @@ test_requirements = (
     "pytest-asyncio",
     "pytest-lazy-fixture",
 )
+mypy_type_packages = ()
+pyproject = toml.load("pyproject.toml")
+test_requirements = pyproject["tool"]["poetry"]["group"]["dev"]["dependencies"].keys()
 
 
 def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
