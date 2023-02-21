@@ -1,6 +1,6 @@
 """Py Healthchecks.Io."""
 # set by poetry-dynamic-versioning
-__version__ = "0.0.0"  # noqa: E402
+__version__ = "0.4.0"  # noqa: E402
 
 from .client import AsyncClient  # noqa: F401, E402
 from .client import Client  # noqa: F401, E402
