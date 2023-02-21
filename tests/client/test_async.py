@@ -1,7 +1,6 @@
 from urllib.parse import urljoin
 
 import pytest
-import respx
 from httpx import AsyncClient as HTTPXAsyncClient
 from httpx import Response
 

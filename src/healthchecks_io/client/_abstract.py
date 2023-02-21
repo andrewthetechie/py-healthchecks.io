@@ -83,7 +83,8 @@ class AbstractClient(ABC):
             endpoint (str): Endpoint to request
 
         Raises:
-            BadAPIRequestError: Raised if you pass a uuid and a slug, or if pinging by a slug and do not have a ping key set
+            BadAPIRequestError: Raised if you pass a uuid and a slug, or if pinging by a slug and do not have a
+            ping key set
 
         Returns:
             str: url for this

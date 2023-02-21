@@ -1,7 +1,6 @@
 from urllib.parse import urljoin
 
 import pytest
-import respx
 from httpx import Client as HTTPXClient
 from httpx import Response
 
