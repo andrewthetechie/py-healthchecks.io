@@ -42,15 +42,14 @@ class Check(BaseModel):
     uuid: Optional[str]
 
     @validator("uuid", always=True)
-    def validate_uuid(
-        cls, value: Optional[str], values: Dict[str, Any]  # noqa: B902
-    ) -> Optional[str]:
+    def validate_uuid(cls, value: Optional[str], values: Dict[str, Any]) -> Optional[str]:  # noqa: B902
         """Tries to set the uuid from the ping_url.
 
         Will return none if a read only token is used because it cannot retrieve the UUID of a check
         """
         if value is None and values.get("ping_url", None) is not None:
-            # url is like healthchecks.io/ping/8f57b84b-86c2-4546-8923-03f83d27604a, so we want just the UUID off the end
+            # url is like healthchecks.io/ping/8f57b84b-86c2-4546-8923-03f83d27604a, so we want just the
+            # UUID off the end
             # Parse the url, grab the path and then just get the name using pathlib
             path = PurePath(str(urlparse(values.get("ping_url")).path))
             return path.name
@@ -66,9 +65,7 @@ class CheckCreate(BaseModel):
     """Pydantic object for creating a check."""
 
     name: Optional[str] = Field("", description="Name of the check")
-    tags: Optional[str] = Field(
-        "", description="String separated list of tags to apply"
-    )
+    tags: Optional[str] = Field("", description="String separated list of tags to apply")
     desc: Optional[str] = Field("", description="Description of the check")
     timeout: Optional[int] = Field(
         86400,
@@ -147,9 +144,7 @@ class CheckCreate(BaseModel):
     def validate_methods(cls, value: str) -> str:
         """Validate that methods."""
         if value not in ("", "POST"):
-            raise ValueError(
-                "Methods is invalid, it should be either an empty string or POST"
-            )
+            raise ValueError("Methods is invalid, it should be either an empty string or POST")
         return value
 
     @validator("unique")
@@ -167,9 +162,7 @@ class CheckUpdate(CheckCreate):
     """Pydantic object for updating a check."""
 
     name: Optional[str] = Field(None, description="Name of the check")
-    tags: Optional[str] = Field(
-        None, description="String separated list of tags to apply"
-    )
+    tags: Optional[str] = Field(None, description="String separated list of tags to apply")
     timeout: Optional[int] = Field(
         None,
         description="The expected period of this check in seconds.",
@@ -243,9 +236,7 @@ class CheckPings(BaseModel):
     duration: Optional[float] = None
 
     @classmethod
-    def from_api_result(
-        cls, ping_dict: Dict[str, Union[str, int, datetime]]
-    ) -> "CheckPings":
+    def from_api_result(cls, ping_dict: Dict[str, Union[str, int, datetime]]) -> "CheckPings":
         """Converts a dictionary from the healthchecks api into a CheckPings object."""
         ping_dict["number_of_pings"] = ping_dict["n"]
         ping_dict["user_agent"] = ping_dict["ua"]

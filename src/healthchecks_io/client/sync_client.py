@@ -90,16 +90,11 @@ class Client(AbstractClient):
         request_url = self._get_api_request_url("checks/")
         if tags is not None:
             for tag in tags:
-                request_url = self._add_url_params(
-                    request_url, {"tag": tag}, replace=False
-                )
+                request_url = self._add_url_params(request_url, {"tag": tag}, replace=False)
 
         response = self.check_response(self._client.get(request_url))
 
-        return [
-            checks.Check.from_api_result(check_data)
-            for check_data in response.json()["checks"]
-        ]
+        return [checks.Check.from_api_result(check_data) for check_data in response.json()["checks"]]
 
     def get_check(self, check_id: str) -> checks.Check:
         """Get a single check by id.
@@ -137,9 +132,7 @@ class Client(AbstractClient):
             Check: check that was just created
         """
         request_url = self._get_api_request_url("checks/")
-        response = self.check_response(
-            self._client.post(request_url, json=new_check.dict(exclude_none=True))
-        )
+        response = self.check_response(self._client.post(request_url, json=new_check.dict(exclude_none=True)))
         return Check.from_api_result(response.json())
 
     def update_check(self, uuid: str, update_check: CheckCreate) -> Check:
@@ -236,10 +229,7 @@ class Client(AbstractClient):
         """
         request_url = self._get_api_request_url(f"checks/{check_id}/pings/")
         response = self.check_response(self._client.get(request_url))
-        return [
-            checks.CheckPings.from_api_result(check_data)
-            for check_data in response.json()["pings"]
-        ]
+        return [checks.CheckPings.from_api_result(check_data) for check_data in response.json()["pings"]]
 
     def get_check_flips(
         self,
@@ -261,8 +251,10 @@ class Client(AbstractClient):
         Args:
             check_id (str): check uuid
             seconds (Optional[int], optional): Returns the flips from the last value seconds. Defaults to None.
-            start (Optional[int], optional): Returns flips that are newer than the specified UNIX timestamp.. Defaults to None.
-            end (Optional[int], optional): Returns flips that are older than the specified UNIX timestamp.. Defaults to None.
+            start (Optional[int], optional): Returns flips that are newer than the specified UNIX timestamp.
+                Defaults to None.
+            end (Optional[int], optional): Returns flips that are older than the specified UNIX timestamp.
+                Defaults to None.
 
         Returns:
             List[checks.CheckStatuses]: List of status flips for this check
@@ -307,7 +299,8 @@ class Client(AbstractClient):
         shields: returns JSON in a Shields.io compatible format.
         In addition, badges have 2-state and 3-state variations:
 
-        svg, json, shields: reports two states: "up" and "down". It considers any checks in the grace period as still "up".
+        svg, json, shields: reports two states: "up" and "down". It considers any checks in the grace period
+            as still "up".
         svg3, json3, shields3: reports three states: "up", "late", and "down".
 
         The response includes a special * entry: this pseudo-tag reports the overal status
@@ -322,14 +315,9 @@ class Client(AbstractClient):
         """
         request_url = self._get_api_request_url("badges/")
         response = self.check_response(self._client.get(request_url))
-        return {
-            key: badges.Badges.from_api_result(item)
-            for key, item in response.json()["badges"].items()
-        }
+        return {key: badges.Badges.from_api_result(item) for key, item in response.json()["badges"].items()}
 
-    def success_ping(
-        self, uuid: str = "", slug: str = "", data: str = ""
-    ) -> Tuple[bool, str]:
+    def success_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that a job has completed successfully.
 
         Can also be used to indicate a continuously running process is still running and healthy.
@@ -363,9 +351,7 @@ class Client(AbstractClient):
         response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    def start_ping(
-        self, uuid: str = "", slug: str = "", data: str = ""
-    ) -> Tuple[bool, str]:
+    def start_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Sends a "job has started!" message to Healthchecks.io.
 
         Sending a "start" signal is optional, but it enables a few extra features:
@@ -401,9 +387,7 @@ class Client(AbstractClient):
         response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    def fail_ping(
-        self, uuid: str = "", slug: str = "", data: str = ""
-    ) -> Tuple[bool, str]:
+    def fail_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
@@ -437,9 +421,7 @@ class Client(AbstractClient):
         response = self.check_ping_response(self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    def exit_code_ping(
-        self, exit_code: int, uuid: str = "", slug: str = "", data: str = ""
-    ) -> Tuple[bool, str]:
+    def exit_code_ping(self, exit_code: int, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.

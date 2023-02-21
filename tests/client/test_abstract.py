@@ -10,7 +10,6 @@ from healthchecks_io import HCAPIAuthError
 from healthchecks_io import HCAPIError
 from healthchecks_io import HCAPIRateLimitError
 from healthchecks_io import NonUniqueSlugError
-from healthchecks_io.client._abstract import AbstractClient
 
 
 def test_abstract_add_url_params(test_abstract_client):
