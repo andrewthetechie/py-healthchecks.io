@@ -1801,14 +1801,14 @@ files = [
 
 [[package]]
 name = "types-pytz"
-version = "2022.7.1.2"
+version = "2023.2.0.1"
 description = "Typing stubs for pytz"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-pytz-2022.7.1.2.tar.gz", hash = "sha256:487d3e8e9f4071eec8081746d53fa982bbc05812e719dcbf2ebf3d55a1a4cd28"},
-    {file = "types_pytz-2022.7.1.2-py3-none-any.whl", hash = "sha256:40ca448a928d566f7d44ddfde0066e384f7ffbd4da2778e42a4570eaca572446"},
+    {file = "types-pytz-2023.2.0.1.tar.gz", hash = "sha256:2dd8a7667740e89ced9da99e4749327bde4c1d78b45c5c38217a296f4564b2b6"},
+    {file = "types_pytz-2023.2.0.1-py3-none-any.whl", hash = "sha256:9422758e1d506fa4b75bc3679b5cbc9ce218696a9178788464b074ff6b986e0a"},
 ]
 
 [[package]]
@@ -1911,4 +1911,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "b096e0799103ca06179020328dff9f6b2db0c01052dd241b49f28fcc00212465"
+content-hash = "312ec2703ff8c42ec5f64f32f364694ccecc00b66834678acdee7d34819b8c52"
