@@ -52,7 +52,7 @@ respx = "^0.20.1"
 pytest-mock = "^3.10.0"
 pytest-lazy-fixture = "^0.6.3"
 pytest-xdist = "^3.2.0"
-ruff = ">=0.0.249,<0.0.276"
+ruff = ">=0.0.249,<0.0.285"
 bandit = "^1.7.4"
 
 [tool.coverage.paths]
