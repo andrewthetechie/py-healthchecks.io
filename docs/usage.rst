@@ -75,7 +75,7 @@ Getting a Check
 
     client = Client(api_key="myapikey")
 
-    check = client.get_check(uuid="mychecksuuid")
+    check = client.get_check(check_id="mychecksuuid")
     print(check)
 
 Pinging a Check
