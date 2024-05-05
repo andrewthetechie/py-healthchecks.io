@@ -76,6 +76,7 @@ async def test_check_trap_async_exception(respx_mock, test_async_client):
 
 @pytest.mark.asyncio
 async def test_check_trap_wrong_client_error(test_client, test_async_client):
+
     with pytest.raises(WrongClientError):
         async with CheckTrap(test_client, uuid="test"):
             pass

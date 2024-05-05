@@ -25,7 +25,7 @@ classifiers = [
 Changelog = "https://github.com/andrewthetechie/py-healthchecks.io/releases"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 pydantic = "^1.9.1"
 httpx = ">=0.23.0,<0.25.0"
 croniter = "^1.1.0"
@@ -67,9 +67,6 @@ source = ["healthchecks_io"]
 show_missing = true
 fail_under = 100
 
-[tool.bandit]
-exclude_dirs = ["tests", "noxfile.py", ".github/scripts", "test_errbot", "dist"]
-
 [tool.mypy]
 strict = true
 warn_unreachable = true
@@ -87,4 +84,4 @@ addopts = "-n 4 --ignore examples --cov=healthchecks_io --cov-report xml:.covera
 
 [tool.ruff]
 line-length = 120
-target-version = "py38"
+target-version = "py37"

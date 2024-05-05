@@ -1,7 +1,11 @@
 """An async healthchecks.io client."""
-
 import asyncio
 from types import TracebackType
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
 from httpx import AsyncClient as HTTPXAsyncClient
 
@@ -25,7 +29,7 @@ class AsyncClient(AbstractClient):
         api_url: str = "https://healthchecks.io/api/",
         ping_url: str = "https://hc-ping.com/",
         api_version: int = 1,
-        client: HTTPXAsyncClient | None = None,
+        client: Optional[HTTPXAsyncClient] = None,
     ) -> None:
         """An AsyncClient can be used in code using asyncio to work with the Healthchecks.io api.
 
@@ -60,9 +64,9 @@ class AsyncClient(AbstractClient):
 
     async def __aexit__(
         self,
-        exc_type: type[BaseException] | None,
-        exc: BaseException | None,
-        traceback: TracebackType | None,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         """Context manager exit."""
         await self._afinalizer_method()
@@ -114,7 +118,7 @@ class AsyncClient(AbstractClient):
         )
         return Check.from_api_result(response.json())
 
-    async def get_checks(self, tags: list[str] | None = None) -> list[Check]:
+    async def get_checks(self, tags: Optional[List[str]] = None) -> List[Check]:
         """Get a list of checks from the healthchecks api.
 
         Args:
@@ -209,7 +213,7 @@ class AsyncClient(AbstractClient):
         response = self.check_response(await self._client.delete(request_url))
         return Check.from_api_result(response.json())
 
-    async def get_check_pings(self, check_id: str) -> list[CheckPings]:
+    async def get_check_pings(self, check_id: str) -> List[CheckPings]:
         """Returns a list of pings this check has received.
 
         This endpoint returns pings in reverse order (most recent first),
@@ -237,10 +241,10 @@ class AsyncClient(AbstractClient):
     async def get_check_flips(
         self,
         check_id: str,
-        seconds: int | None = None,
-        start: int | None = None,
-        end: int | None = None,
-    ) -> list[CheckStatuses]:
+        seconds: Optional[int] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+    ) -> List[CheckStatuses]:
         """Returns a list of "flips" this check has experienced.
 
         A flip is a change of status (from "down" to "up," or from "up" to "down").
@@ -277,7 +281,7 @@ class AsyncClient(AbstractClient):
         response = self.check_response(await self._client.get(request_url))
         return [CheckStatuses(**status_data) for status_data in response.json()]
 
-    async def get_integrations(self) -> list[Integration | None]:
+    async def get_integrations(self) -> List[Optional[Integration]]:
         """Returns a list of integrations belonging to the project.
 
         Raises:
@@ -293,7 +297,7 @@ class AsyncClient(AbstractClient):
         response = self.check_response(await self._client.get(request_url))
         return [Integration.from_api_result(integration_dict) for integration_dict in response.json()["channels"]]
 
-    async def get_badges(self) -> dict[str, Badges]:
+    async def get_badges(self) -> Dict[str, Badges]:
         """Returns a dict of all tags in the project, with badge URLs for each tag.
 
         Healthchecks.io provides badges in a few different formats:
@@ -321,7 +325,7 @@ class AsyncClient(AbstractClient):
         response = self.check_response(await self._client.get(request_url))
         return {key: Badges.from_api_result(item) for key, item in response.json()["badges"].items()}
 
-    async def success_ping(self, uuid: str = "", slug: str = "", data: str = "") -> tuple[bool, str]:
+    async def success_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that a job has completed successfully.
 
         Can also be used to indicate a continuously running process is still running and healthy.
@@ -355,7 +359,7 @@ class AsyncClient(AbstractClient):
         response = self.check_ping_response(await self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    async def start_ping(self, uuid: str = "", slug: str = "", data: str = "") -> tuple[bool, str]:
+    async def start_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Sends a "job has started!" message to Healthchecks.io.
 
         Sending a "start" signal is optional, but it enables a few extra features:
@@ -391,7 +395,7 @@ class AsyncClient(AbstractClient):
         response = self.check_ping_response(await self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    async def fail_ping(self, uuid: str = "", slug: str = "", data: str = "") -> tuple[bool, str]:
+    async def fail_ping(self, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.
@@ -425,7 +429,7 @@ class AsyncClient(AbstractClient):
         response = self.check_ping_response(await self._client.post(ping_url, content=data))
         return (True if response.status_code == 200 else False, response.text)
 
-    async def exit_code_ping(self, exit_code: int, uuid: str = "", slug: str = "", data: str = "") -> tuple[bool, str]:
+    async def exit_code_ping(self, exit_code: int, uuid: str = "", slug: str = "", data: str = "") -> Tuple[bool, str]:
         """Signals to Healthchecks.io that the job has failed.
 
         Actively signaling a failure minimizes the delay from your monitored service failing to you receiving an alert.

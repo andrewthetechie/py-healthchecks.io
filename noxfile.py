@@ -1,5 +1,4 @@
 """Nox sessions."""
-
 import os
 import shlex
 import shutil
@@ -24,7 +23,7 @@ except ImportError:
 
 
 package = "healthchecks_io"
-python_versions = ["3.10", "3.11", "3.9", "3.8"]
+python_versions = ["3.10", "3.11", "3.9", "3.8", "3.7"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
@@ -32,6 +31,7 @@ nox.options.sessions = (
     "safety",
     "mypy",
     "tests",
+    # "typeguard",
     "xdoctest",
     "docs-build",
 )
@@ -59,7 +59,7 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
     Args:
         session: The Session object.
     """
-    assert session.bin is not None  # nosec: B101
+    assert session.bin is not None  # noqa: S101
 
     # Only patch hooks containing a reference to this session's bindir. Support
     # quoting rules for Python and bash, but strip the outermost quotes so we

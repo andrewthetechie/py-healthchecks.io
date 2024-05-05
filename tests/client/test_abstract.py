@@ -13,7 +13,10 @@ from healthchecks_io import NonUniqueSlugError
 
 
 def test_abstract_add_url_params(test_abstract_client):
-    url = test_abstract_client._add_url_params("http://test.com/?test=test", {"test": "test2"})
+
+    url = test_abstract_client._add_url_params(
+        "http://test.com/?test=test", {"test": "test2"}
+    )
     assert url == "http://test.com/?test=test2"
 
 
