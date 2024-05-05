@@ -2,6 +2,7 @@
 
 https://healthchecks.io/docs/api/
 """
+
 from datetime import datetime
 from pathlib import PurePath
 from typing import Any
@@ -88,8 +89,7 @@ class CheckCreate(BaseModel):
     )
     tz: Optional[str] = Field(
         "UTC",
-        description="Server's timezone. This setting only has an effect "
-        "in combination with the schedule parameter.",
+        description="Server's timezone. This setting only has an effect " "in combination with the schedule parameter.",
     )
     manual_resume: Optional[bool] = Field(
         False,
@@ -184,8 +184,7 @@ class CheckUpdate(CheckCreate):
     )
     tz: Optional[str] = Field(
         None,
-        description="Server's timezone. This setting only has an effect "
-        "in combination with the schedule parameter.",
+        description="Server's timezone. This setting only has an effect " "in combination with the schedule parameter.",
     )
     manual_resume: Optional[bool] = Field(
         None,

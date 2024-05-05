@@ -2,6 +2,7 @@
 
 https://healthchecks.io/docs/api/
 """
+
 from typing import Dict
 
 from pydantic import BaseModel

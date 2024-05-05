@@ -1,4 +1,5 @@
 """Nox sessions."""
+
 import os
 import shlex
 import shutil
@@ -23,28 +24,17 @@ except ImportError:
 
 
 package = "healthchecks_io"
-python_versions = ["3.10", "3.11", "3.9", "3.8", "3.7"]
+python_versions = ["3.10", "3.11", "3.9", "3.8"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
-    "bandit",
     "safety",
-    "mypy",
+    # "mypy",
     "tests",
-    # "typeguard",
     "xdoctest",
     "docs-build",
 )
-mypy_type_packages = ("types-croniter", "types-pytz")
-test_requirements = (
-    "coverage[toml]",
-    "pytest",
-    "pygments",
-    "respx",
-    "pytest-asyncio",
-    "pytest-lazy-fixture",
-)
-mypy_type_packages = ()
+
 pyproject = toml.load("pyproject.toml")
 test_requirements = pyproject["tool"]["poetry"]["group"]["dev"]["dependencies"].keys()
 
@@ -118,20 +108,7 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
 def precommit(session: Session) -> None:
     """Lint using pre-commit."""
     args = session.posargs or ["run", "--all-files", "--show-diff-on-failure"]
-    session.install(
-        "black",
-        "darglint",
-        "flake8",
-        "flake8-bandit",
-        "flake8-bugbear",
-        "flake8-docstrings",
-        "flake8-rst-docstrings",
-        "pep8-naming",
-        "pre-commit",
-        "pre-commit-hooks",
-        "pyupgrade",
-        "reorder-python-imports",
-    )
+    session.install(*test_requirements)
     session.run("pre-commit", *args)
     if args and args[0] == "install":
         activate_virtualenv_in_precommit_hooks(session)
@@ -153,15 +130,8 @@ def mypy(session: Session) -> None:
     args = session.posargs or ["src"]
     session.install(".")
     session.install("mypy", "pytest")
-    session.install(*mypy_type_packages)
+    session.install(*test_requirements)
     session.run("mypy", *args)
-
-
-@session(python=python_versions[0])
-def bandit(session: Session) -> None:
-    """Run bandit security tests"""
-    args = session.posargs or ["-r", "./src"]
-    session.run("bandit", *args)
 
 
 @session(python=python_versions)

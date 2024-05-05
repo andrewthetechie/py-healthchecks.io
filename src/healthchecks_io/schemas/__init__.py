@@ -1,4 +1,5 @@
 """Schemas for healthchecks_io."""
+
 from .badges import Badges
 from .checks import Check
 from .checks import CheckCreate

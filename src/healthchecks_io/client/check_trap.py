@@ -1,4 +1,5 @@
 """CheckTrap is a context manager to wrap around python code to communicate results to a Healthchecks check."""
+
 from types import TracebackType
 from typing import List
 from typing import Optional
@@ -68,9 +69,7 @@ class CheckTrap:
             CheckTrap: self
         """
         if isinstance(self.client, AsyncClient):
-            raise WrongClientError(
-                "You passed an AsyncClient, use this as an async context manager"
-            )
+            raise WrongClientError("You passed an AsyncClient, use this as an async context manager")
         result = self.client.start_ping(uuid=self.uuid, slug=self.slug)
         if not result[0]:
             raise PingFailedError(result[1])
@@ -96,9 +95,7 @@ class CheckTrap:
             Optional[bool]: self.suppress_exceptions, if true will not raise any exceptions
         """
         if exc_type is None:
-            self.client.success_ping(
-                self.uuid, self.slug, data="\n".join(self.log_lines)
-            )
+            self.client.success_ping(self.uuid, self.slug, data="\n".join(self.log_lines))
         else:
             self.add_log(str(exc))
             self.add_log(str(traceback))
@@ -125,9 +122,7 @@ class CheckTrap:
             CheckTrap: self
         """
         if isinstance(self.client, Client):
-            raise WrongClientError(
-                "You passed a sync Client, use this as a regular context manager"
-            )
+            raise WrongClientError("You passed a sync Client, use this as a regular context manager")
         result = await self.client.start_ping(self.uuid, self.slug)
         if not result[0]:
             raise PingFailedError(result[1])

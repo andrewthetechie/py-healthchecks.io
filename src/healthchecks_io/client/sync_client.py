@@ -1,4 +1,5 @@
 """An async healthchecks.io client."""
+
 from types import TracebackType
 from typing import Dict
 from typing import List
