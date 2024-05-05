@@ -2,13 +2,10 @@
 
 https://healthchecks.io/docs/api/
 """
+
 from datetime import datetime
 from pathlib import PurePath
 from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Union
 from urllib.parse import urlparse
 
 import pytz
@@ -21,28 +18,28 @@ from pydantic import validator
 class Check(BaseModel):
     """Schema for a check object, either from a readonly api request or a rw api request."""
 
-    unique_key: Optional[str]
+    unique_key: str | None
     name: str
     slug: str
-    tags: Optional[str]
-    desc: Optional[str]
+    tags: str | None
+    desc: str | None
     grace: int
     n_pings: int
     status: str
-    last_ping: Optional[datetime]
-    next_ping: Optional[datetime]
+    last_ping: datetime | None
+    next_ping: datetime | None
     manual_resume: bool
-    methods: Optional[str]
+    methods: str | None
     # healthchecks.io's api doesn't return a scheme so we cant use Pydantic AnyUrl here
-    ping_url: Optional[str]
-    update_url: Optional[str]
-    pause_url: Optional[str]
-    channels: Optional[str]
-    timeout: Optional[int]
-    uuid: Optional[str]
+    ping_url: str | None
+    update_url: str | None
+    pause_url: str | None
+    channels: str | None
+    timeout: int | None
+    uuid: str | None
 
     @validator("uuid", always=True)
-    def validate_uuid(cls, value: Optional[str], values: Dict[str, Any]) -> Optional[str]:  # noqa: B902
+    def validate_uuid(cls, value: str | None, values: dict[str, Any]) -> str | None:  # noqa: B902
         """Tries to set the uuid from the ping_url.
 
         Will return none if a read only token is used because it cannot retrieve the UUID of a check
@@ -56,7 +53,7 @@ class Check(BaseModel):
         return value
 
     @classmethod
-    def from_api_result(cls, check_dict: Dict[str, Any]) -> "Check":
+    def from_api_result(cls, check_dict: dict[str, Any]) -> "Check":
         """Converts a dictionary from the healthchecks api into an Check object."""
         return cls(**check_dict)
 
@@ -64,34 +61,33 @@ class Check(BaseModel):
 class CheckCreate(BaseModel):
     """Pydantic object for creating a check."""
 
-    name: Optional[str] = Field("", description="Name of the check")
-    tags: Optional[str] = Field("", description="String separated list of tags to apply")
-    desc: Optional[str] = Field("", description="Description of the check")
-    timeout: Optional[int] = Field(
+    name: str | None = Field("", description="Name of the check")
+    tags: str | None = Field("", description="String separated list of tags to apply")
+    desc: str | None = Field("", description="Description of the check")
+    timeout: int | None = Field(
         86400,
         description="The expected period of this check in seconds.",
         gte=60,
         lte=31536000,
     )
-    grace: Optional[int] = Field(
+    grace: int | None = Field(
         3600,
         description="The grace period for this check in seconds.",
         gte=60,
         lte=31536000,
     )
-    schedule: Optional[str] = Field(
+    schedule: str | None = Field(
         None,
         description="A cron expression defining this check's schedule. "
         "If you specify both timeout and schedule parameters, "
         "Healthchecks.io will create a Cron check and ignore the "
         "timeout value.",
     )
-    tz: Optional[str] = Field(
+    tz: str | None = Field(
         "UTC",
-        description="Server's timezone. This setting only has an effect "
-        "in combination with the schedule parameter.",
+        description="Server's timezone. This setting only has an effect " "in combination with the schedule parameter.",
     )
-    manual_resume: Optional[bool] = Field(
+    manual_resume: bool | None = Field(
         False,
         description="Controls whether a paused check automatically resumes "
         "when pinged (the default) or not. If set to false, a paused "
@@ -99,7 +95,7 @@ class CheckCreate(BaseModel):
         "If set to true, a paused check will ignore pings and stay "
         "paused until you manually resume it from the web dashboard.",
     )
-    methods: Optional[str] = Field(
+    methods: str | None = Field(
         "",
         description="Specifies the allowed HTTP methods for making "
         "ping requests. Must be one of the two values: an empty "
@@ -107,7 +103,7 @@ class CheckCreate(BaseModel):
         "allow HEAD, GET, and POST requests. Set this field to "
         "POST to allow only POST requests.",
     )
-    channels: Optional[str] = Field(
+    channels: str | None = Field(
         None,
         description="By default, this API call assigns no integrations"
         "to the newly created check. By default, this API call "
@@ -115,7 +111,7 @@ class CheckCreate(BaseModel):
         "To assign specific integrations, use a comma-separated list "
         "of integration UUIDs.",
     )
-    unique: Optional[List[Optional[str]]] = Field(
+    unique: list[str | None] | None = Field(
         [],
         description="Enables upsert functionality. Before creating a check, "
         "Healthchecks.io looks for existing checks, filtered by fields listed "
@@ -148,7 +144,7 @@ class CheckCreate(BaseModel):
         return value
 
     @validator("unique")
-    def validate_unique(cls, value: List[Optional[str]]) -> List[Optional[str]]:
+    def validate_unique(cls, value: list[str | None]) -> list[str | None]:
         """Validate unique list."""
         for unique in value:
             if unique not in ("name", "tags", "timeout", "grace"):
@@ -161,33 +157,32 @@ class CheckCreate(BaseModel):
 class CheckUpdate(CheckCreate):
     """Pydantic object for updating a check."""
 
-    name: Optional[str] = Field(None, description="Name of the check")
-    tags: Optional[str] = Field(None, description="String separated list of tags to apply")
-    timeout: Optional[int] = Field(
+    name: str | None = Field(None, description="Name of the check")
+    tags: str | None = Field(None, description="String separated list of tags to apply")
+    timeout: int | None = Field(
         None,
         description="The expected period of this check in seconds.",
         gte=60,
         lte=31536000,
     )
-    grace: Optional[int] = Field(
+    grace: int | None = Field(
         None,
         description="The grace period for this check in seconds.",
         gte=60,
         lte=31536000,
     )
-    schedule: Optional[str] = Field(
+    schedule: str | None = Field(
         None,
         description="A cron expression defining this check's schedule. "
         "If you specify both timeout and schedule parameters, "
         "Healthchecks.io will create a Cron check and ignore the "
         "timeout value.",
     )
-    tz: Optional[str] = Field(
+    tz: str | None = Field(
         None,
-        description="Server's timezone. This setting only has an effect "
-        "in combination with the schedule parameter.",
+        description="Server's timezone. This setting only has an effect " "in combination with the schedule parameter.",
     )
-    manual_resume: Optional[bool] = Field(
+    manual_resume: bool | None = Field(
         None,
         description="Controls whether a paused check automatically resumes "
         "when pinged (the default) or not. If set to false, a paused "
@@ -195,7 +190,7 @@ class CheckUpdate(CheckCreate):
         "If set to true, a paused check will ignore pings and stay "
         "paused until you manually resume it from the web dashboard.",
     )
-    methods: Optional[str] = Field(
+    methods: str | None = Field(
         None,
         description="Specifies the allowed HTTP methods for making "
         "ping requests. Must be one of the two values: an empty "
@@ -203,7 +198,7 @@ class CheckUpdate(CheckCreate):
         "allow HEAD, GET, and POST requests. Set this field to "
         "POST to allow only POST requests.",
     )
-    channels: Optional[str] = Field(
+    channels: str | None = Field(
         None,
         description="By default, this API call assigns no integrations"
         "to the newly created check. By default, this API call "
@@ -211,7 +206,7 @@ class CheckUpdate(CheckCreate):
         "To assign specific integrations, use a comma-separated list "
         "of integration UUIDs.",
     )
-    unique: Optional[List[Optional[str]]] = Field(
+    unique: list[str | None] | None = Field(
         None,
         description="Enables upsert functionality. Before creating a check, "
         "Healthchecks.io looks for existing checks, filtered by fields listed "
@@ -233,10 +228,10 @@ class CheckPings(BaseModel):
     remote_addr: str
     method: str
     user_agent: str
-    duration: Optional[float] = None
+    duration: float | None = None
 
     @classmethod
-    def from_api_result(cls, ping_dict: Dict[str, Union[str, int, datetime]]) -> "CheckPings":
+    def from_api_result(cls, ping_dict: dict[str, str | int | datetime]) -> "CheckPings":
         """Converts a dictionary from the healthchecks api into a CheckPings object."""
         ping_dict["number_of_pings"] = ping_dict["n"]
         ping_dict["user_agent"] = ping_dict["ua"]

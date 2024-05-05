@@ -1,9 +1,6 @@
 """CheckTrap is a context manager to wrap around python code to communicate results to a Healthchecks check."""
+
 from types import TracebackType
-from typing import List
-from typing import Optional
-from typing import Type
-from typing import Union
 
 from .async_client import AsyncClient
 from .exceptions import PingFailedError
@@ -16,7 +13,7 @@ class CheckTrap:
 
     def __init__(
         self,
-        client: Union[Client, AsyncClient],
+        client: Client | AsyncClient,
         uuid: str = "",
         slug: str = "",
         suppress_exceptions: bool = False,
@@ -34,10 +31,10 @@ class CheckTrap:
         """
         if uuid == "" and slug == "":
             raise Exception("Must pass a slug or an uuid")
-        self.client: Union[Client, AsyncClient] = client
+        self.client: Client | AsyncClient = client
         self.uuid: str = uuid
         self.slug: str = slug
-        self.log_lines: List[str] = list()
+        self.log_lines: list[str] = list()
         self.suppress_exceptions: bool = suppress_exceptions
 
     def add_log(self, line: str) -> None:
@@ -68,9 +65,7 @@ class CheckTrap:
             CheckTrap: self
         """
         if isinstance(self.client, AsyncClient):
-            raise WrongClientError(
-                "You passed an AsyncClient, use this as an async context manager"
-            )
+            raise WrongClientError("You passed an AsyncClient, use this as an async context manager")
         result = self.client.start_ping(uuid=self.uuid, slug=self.slug)
         if not result[0]:
             raise PingFailedError(result[1])
@@ -78,10 +73,10 @@ class CheckTrap:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> Optional[bool]:
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> bool | None:
         """Exit the context manager.
 
         If there is an exception, add it to any log lines and send a fail ping.
@@ -96,9 +91,7 @@ class CheckTrap:
             Optional[bool]: self.suppress_exceptions, if true will not raise any exceptions
         """
         if exc_type is None:
-            self.client.success_ping(
-                self.uuid, self.slug, data="\n".join(self.log_lines)
-            )
+            self.client.success_ping(self.uuid, self.slug, data="\n".join(self.log_lines))
         else:
             self.add_log(str(exc))
             self.add_log(str(traceback))
@@ -125,9 +118,7 @@ class CheckTrap:
             CheckTrap: self
         """
         if isinstance(self.client, Client):
-            raise WrongClientError(
-                "You passed a sync Client, use this as a regular context manager"
-            )
+            raise WrongClientError("You passed a sync Client, use this as a regular context manager")
         result = await self.client.start_ping(self.uuid, self.slug)
         if not result[0]:
             raise PingFailedError(result[1])
@@ -135,10 +126,10 @@ class CheckTrap:
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> Optional[bool]:
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> bool | None:
         """Exit the context manager.
 
         If there is an exception, add it to any log lines and send a fail ping.

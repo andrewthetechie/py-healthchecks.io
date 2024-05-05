@@ -1,6 +1,4 @@
 from datetime import datetime
-from typing import Dict
-from typing import Union
 
 import pytest
 
@@ -11,7 +9,7 @@ from healthchecks_io.schemas import checks
 
 
 @pytest.fixture
-def fake_check_api_result() -> Dict[str, Union[str, int]]:
+def fake_check_api_result() -> dict[str, str | int]:
     yield {
         "name": "Test Check",
         "slug": "Test Check",
@@ -33,7 +31,7 @@ def fake_check_api_result() -> Dict[str, Union[str, int]]:
 
 
 @pytest.fixture
-def fake_check_ro_api_result() -> Dict[str, Union[str, int]]:
+def fake_check_ro_api_result() -> dict[str, str | int]:
     yield {
         "name": "Test Check",
         "slug": "Test Check",

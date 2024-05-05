@@ -1,4 +1,5 @@
 """Py Healthchecks.Io."""
+
 # set by poetry-dynamic-versioning
 __version__ = "0.4.0"  # noqa: E402
 

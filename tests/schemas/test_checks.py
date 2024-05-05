@@ -37,27 +37,19 @@ def test_check_create_validators():
 
     # test validate_schedule
     with pytest.raises(ValidationError):
-        check_create = checks.CheckCreate(
-            name="Test", tags="", desc="Test", schedule="no good"
-        )
+        check_create = checks.CheckCreate(name="Test", tags="", desc="Test", schedule="no good")
 
     # test validate_tz
     with pytest.raises(ValidationError):
-        check_create = checks.CheckCreate(
-            name="Test", tags="", desc="Test", tz="no good"
-        )
+        check_create = checks.CheckCreate(name="Test", tags="", desc="Test", tz="no good")
 
     # test validate_methods
     with pytest.raises(ValidationError):
-        check_create = checks.CheckCreate(
-            name="Test", tags="", desc="Test", methods="no good"
-        )
+        check_create = checks.CheckCreate(name="Test", tags="", desc="Test", methods="no good")
 
     # test validate_unique
     with pytest.raises(ValidationError):
-        check_create = checks.CheckCreate(
-            name="Test", tags="", desc="Test", unique=["no good"]
-        )
+        check_create = checks.CheckCreate(name="Test", tags="", desc="Test", unique=["no good"])
 
 
 def test_check_pings_from_api():

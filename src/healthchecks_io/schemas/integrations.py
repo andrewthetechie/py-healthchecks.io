@@ -2,7 +2,6 @@
 
 https://healthchecks.io/docs/api/
 """
-from typing import Dict
 
 from pydantic import BaseModel
 
@@ -15,6 +14,6 @@ class Integration(BaseModel):
     kind: str
 
     @classmethod
-    def from_api_result(cls, integration_dict: Dict[str, str]) -> "Integration":
+    def from_api_result(cls, integration_dict: dict[str, str]) -> "Integration":
         """Converts a dictionary from the healthchecks api into an Integration object."""
         return cls(**integration_dict)

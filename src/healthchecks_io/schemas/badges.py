@@ -2,7 +2,6 @@
 
 https://healthchecks.io/docs/api/
 """
-from typing import Dict
 
 from pydantic import BaseModel
 
@@ -18,7 +17,7 @@ class Badges(BaseModel):
     shields3: str
 
     @classmethod
-    def from_api_result(cls, badges_dict: Dict[str, str]) -> "Badges":
+    def from_api_result(cls, badges_dict: dict[str, str]) -> "Badges":
         """Converts a dictionary from the healthchecks api into a Badges object."""
         badges_dict["json_url"] = badges_dict["json"]
         badges_dict["json3_url"] = badges_dict["json3"]

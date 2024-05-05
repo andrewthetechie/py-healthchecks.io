@@ -1,9 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Union
 from urllib.parse import parse_qsl
 from urllib.parse import ParseResult
 from urllib.parse import unquote
@@ -57,9 +54,7 @@ class AbstractClient(ABC):
         """Finalizer method is called by weakref.finalize when the object is dereferenced to do cleanup of clients."""
         pass
 
-    def _get_api_request_url(
-        self, path: str, params: Optional[Dict[str, Any]] = None
-    ) -> str:
+    def _get_api_request_url(self, path: str, params: dict[str, Any] | None = None) -> str:
         """Get a full request url for the healthchecks api.
 
         Args:
@@ -165,9 +160,7 @@ class AbstractClient(ABC):
             raise CheckNotFoundError(f"CHeck not found at {response.request.url}")
 
         if response.status_code == 400:
-            raise BadAPIRequestError(
-                f"Bad request when requesting {response.request.url}. {response.text}"
-            )
+            raise BadAPIRequestError(f"Bad request when requesting {response.request.url}. {response.text}")
 
         return response
 
@@ -208,21 +201,15 @@ class AbstractClient(ABC):
             raise HCAPIRateLimitError(f"Rate limited on {response.request.url}")
 
         if response.status_code == 400:
-            raise BadAPIRequestError(
-                f"Bad request when requesting {response.request.url}. {response.text}"
-            )
+            raise BadAPIRequestError(f"Bad request when requesting {response.request.url}. {response.text}")
 
         if response.status_code == 409:
-            raise NonUniqueSlugError(
-                f"Bad request, slug conflict {response.request.url}. {response.text}"
-            )
+            raise NonUniqueSlugError(f"Bad request, slug conflict {response.request.url}. {response.text}")
 
         return response
 
     @staticmethod
-    def _add_url_params(
-        url: str, params: Dict[str, Union[str, int, bool]], replace: bool = True
-    ) -> str:
+    def _add_url_params(url: str, params: dict[str, str | int | bool], replace: bool = True) -> str:
         """Add GET params to provided URL being aware of existing.
 
         :param url: string of target URL
@@ -255,12 +242,7 @@ class AbstractClient(ABC):
             # get all the duplicated keys from params and urlencode them, we'll concat this to the params string later
             duplicated_params = [x for x in params if x in parsed_get_args]
             # get all the args that aren't duplicated and add them to parsed_get_args
-            parsed_get_args.update(
-                {
-                    key: parsed_params[key]
-                    for key in [x for x in params if x not in parsed_get_args]
-                }
-            )
+            parsed_get_args.update({key: parsed_params[key] for key in [x for x in params if x not in parsed_get_args]})
             # if we have any duplicated parameters, urlencode them, we append them later
             extra_parameters = (
                 f"&{urlencode({key: params[key] for key in duplicated_params}, doseq=True)}"
