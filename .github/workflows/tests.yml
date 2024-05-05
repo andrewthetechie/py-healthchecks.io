@@ -70,29 +70,3 @@ jobs:
       - name: Run Nox
         run: |
           nox --force-color --python=${{ matrix.python }}
-
-      - name: Upload coverage data
-        if: always() && matrix.session == 'tests'
-        uses: "actions/upload-artifact@v4.3.3"
-        with:
-          name: coverage-data
-          path: ".coverage.*"
-
-  coverage:
-    runs-on: ubuntu-latest
-    needs: tests
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4.1.4
-
-      - name: Download coverage data
-        uses: actions/download-artifact@v4.1.7
-        with:
-          name: coverage-data
-          path: ./
-      - run: ls -R
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4.3.0
-        with:
-          files: .coverage.xml
-          verbose: true
