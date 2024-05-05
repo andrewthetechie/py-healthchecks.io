@@ -17,7 +17,6 @@ jobs:
           - { python: "3.11", os: "ubuntu-latest", session: "tests" }
           - { python: "3.9", os: "ubuntu-latest", session: "tests" }
           - { python: "3.8", os: "ubuntu-latest", session: "tests" }
-          - { python: "3.7", os: "ubuntu-latest", session: "tests" }
           - { python: "3.10", os: "ubuntu-latest", session: "xdoctest" }
           - { python: "3.10", os: "ubuntu-latest", session: "docs-build" }
 
@@ -39,6 +38,7 @@ jobs:
         run: |
           pip install --upgrade pip nox poetry virtualenv toml --constraint=.github/workflows/constraints.txt
           pip --version
+          # separate out nox-poetry until it gets a released version with support for 1.8
           pip install --upgrade nox-poetry --constraint=.github/workflows/constraints.txt
 
       - name: Compute pre-commit cache key
