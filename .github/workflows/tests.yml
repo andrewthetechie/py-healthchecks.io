@@ -37,8 +37,9 @@ jobs:
 
       - name: Install needed tools
         run: |
-          pip install --upgrade -r .github/workflows/constraints.txt
+          pip install --upgrade pip nox poetry virtualenv toml --constraint=.github/workflows/constraints.txt
           pip --version
+          pip install --upgrade nox-poetry --constraint=.github/workflows/constraints.txt
 
       - name: Compute pre-commit cache key
         if: matrix.session == 'pre-commit'
