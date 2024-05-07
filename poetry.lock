@@ -321,17 +321,18 @@ toml = ["tomli"]
 
 [[package]]
 name = "croniter"
-version = "1.4.1"
+version = "2.0.5"
 description = "croniter provides iteration for datetime object with cron like format"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.6"
 files = [
-    {file = "croniter-1.4.1-py2.py3-none-any.whl", hash = "sha256:9595da48af37ea06ec3a9f899738f1b2c1c13da3c38cea606ef7cd03ea421128"},
-    {file = "croniter-1.4.1.tar.gz", hash = "sha256:1a6df60eacec3b7a0aa52a8f2ef251ae3dd2a7c7c8b9874e73e791636d55a361"},
+    {file = "croniter-2.0.5-py2.py3-none-any.whl", hash = "sha256:fdbb44920944045cc323db54599b321325141d82d14fa7453bc0699826bbe9ed"},
+    {file = "croniter-2.0.5.tar.gz", hash = "sha256:f1f8ca0af64212fbe99b1bee125ee5a1b53a9c1b433968d8bca8817b79d237f3"},
 ]
 
 [package.dependencies]
 python-dateutil = "*"
+pytz = ">2021.1"
 
 [[package]]
 name = "distlib"
@@ -1726,4 +1727,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "abb5f3c00627ad0bfdcfd3604df09bd51d99603c30e9528e6f5cf2dd85ae336f"
+content-hash = "d9bf588126a3335b8cdcf9793d18b5bd7a4358899887077d9426eef8807e8d2f"
