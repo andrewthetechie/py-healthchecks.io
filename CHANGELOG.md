@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.3](https://github.com/andrewthetechie/py-healthchecks.io/compare/v0.4.2...v0.4.3) (2024-06-01)
+
+
+### Dependencies
+
+* bump coverage from 7.5.1 to 7.5.2 ([#680](https://github.com/andrewthetechie/py-healthchecks.io/issues/680)) ([b372e66](https://github.com/andrewthetechie/py-healthchecks.io/commit/b372e66c44ae403af042a43b3d7de41142570eb3))
+* bump coverage from 7.5.2 to 7.5.3 ([#683](https://github.com/andrewthetechie/py-healthchecks.io/issues/683)) ([5325352](https://github.com/andrewthetechie/py-healthchecks.io/commit/5325352bae60b332f4602e37adb3f35cc8ae11c7))
+* bump httpx from 0.24.1 to 0.27.0 ([#668](https://github.com/andrewthetechie/py-healthchecks.io/issues/668)) ([6e88834](https://github.com/andrewthetechie/py-healthchecks.io/commit/6e88834d93ea28f9bfeb7b81bcac8227ee38580c))
+* bump pre-commit from 2.21.0 to 3.5.0 ([#669](https://github.com/andrewthetechie/py-healthchecks.io/issues/669)) ([4d00499](https://github.com/andrewthetechie/py-healthchecks.io/commit/4d00499f94c7e6ad4af86742996fca9c266e8ddf))
+* bump ruff from 0.4.3 to 0.4.4 ([#675](https://github.com/andrewthetechie/py-healthchecks.io/issues/675)) ([e46f70c](https://github.com/andrewthetechie/py-healthchecks.io/commit/e46f70c4708eb703c0f02a97efe62a94145f6e58))
+* bump ruff from 0.4.4 to 0.4.5 ([#679](https://github.com/andrewthetechie/py-healthchecks.io/issues/679)) ([55ea01d](https://github.com/andrewthetechie/py-healthchecks.io/commit/55ea01de63c43865c0b41b4248f02d96b17f1c07))
+* bump ruff from 0.4.5 to 0.4.6 ([#681](https://github.com/andrewthetechie/py-healthchecks.io/issues/681)) ([627f070](https://github.com/andrewthetechie/py-healthchecks.io/commit/627f070e3fcbaf53a523a5b81b0699e39ffc4229))
+* bump types-pytz from 2023.4.0.20240130 to 2024.1.0.20240417 ([#672](https://github.com/andrewthetechie/py-healthchecks.io/issues/672)) ([e24fcb2](https://github.com/andrewthetechie/py-healthchecks.io/commit/e24fcb233bd7a35f3999e9fb7bd174ef357ecdcb))
+
 ## [0.4.2](https://github.com/andrewthetechie/py-healthchecks.io/compare/v0.4.1...v0.4.2) (2024-05-07)
 
 
