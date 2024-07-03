@@ -121,6 +121,10 @@ def safety(session: Session) -> None:
     session.install("safety")
     # ignore https://github.com/pytest-dev/py/issues/287
     # its an irresposnbily filed CVE causing nose
+    # ignore https://data.safetycli.com/v/70612/97c/
+    # Jinja2 vulnerability, maintainer believe it is not a valid vulnerability
+    # ignore https://data.safetycli.com/v/71064/97c/
+    # requests vulnerability. The fixed version is not compatible with the packaging library
     session.run("safety", "check", "--full-report", f"--file={requirements}", "--ignore=51457,70612,71064")
 
 

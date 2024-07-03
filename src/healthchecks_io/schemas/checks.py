@@ -14,9 +14,8 @@ from urllib.parse import urlparse
 
 import pytz
 from croniter import croniter
-from pydantic import field_validator, BaseModel
+from pydantic import field_validator, BaseModel, ValidationInfo
 from pydantic import Field
-from pydantic import validator
 
 
 class Check(BaseModel):
@@ -40,21 +39,20 @@ class Check(BaseModel):
     pause_url: Optional[str] = None
     channels: Optional[str] = None
     timeout: Optional[int] = None
-    uuid: Optional[str] = None
+    uuid: Optional[str] = Field(default=None, validate_default=True)
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("uuid", always=True)
-    def validate_uuid(cls, value: Optional[str], values: Dict[str, Any]) -> Optional[str]:  # noqa: B902
+    @field_validator("uuid")
+    @classmethod
+    def validate_uuid(cls, value: Optional[str], info: ValidationInfo) -> Optional[str]:  # noqa: B902
         """Tries to set the uuid from the ping_url.
 
         Will return none if a read only token is used because it cannot retrieve the UUID of a check
         """
-        if value is None and values.get("ping_url", None) is not None:
+        if value is None and info.data.get("ping_url", None) is not None:
             # url is like healthchecks.io/ping/8f57b84b-86c2-4546-8923-03f83d27604a, so we want just the
             # UUID off the end
             # Parse the url, grab the path and then just get the name using pathlib
-            path = PurePath(str(urlparse(values.get("ping_url")).path))
+            path = PurePath(str(urlparse(info.data.get("ping_url")).path))
             return path.name
         return value
 
