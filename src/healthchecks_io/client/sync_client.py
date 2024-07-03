@@ -302,6 +302,7 @@ class Client(AbstractClient):
 
         svg, json, shields: reports two states: "up" and "down". It considers any checks in the grace period
             as still "up".
+
         svg3, json3, shields3: reports three states: "up", "late", and "down".
 
         The response includes a special * entry: this pseudo-tag reports the overal status
