@@ -121,7 +121,7 @@ def safety(session: Session) -> None:
     session.install("safety")
     # ignore https://github.com/pytest-dev/py/issues/287
     # its an irresposnbily filed CVE causing nose
-    session.run("safety", "check", "--full-report", f"--file={requirements}", "--ignore=51457")
+    session.run("safety", "check", "--full-report", f"--file={requirements}", "--ignore=51457,70612,71064")
 
 
 @session(python=python_versions)

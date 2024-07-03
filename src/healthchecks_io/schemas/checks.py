@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 
 import pytz
 from croniter import croniter
-from pydantic import BaseModel
+from pydantic import field_validator, BaseModel
 from pydantic import Field
 from pydantic import validator
 
@@ -22,26 +22,28 @@ from pydantic import validator
 class Check(BaseModel):
     """Schema for a check object, either from a readonly api request or a rw api request."""
 
-    unique_key: Optional[str]
+    unique_key: Optional[str] = None
     name: str
     slug: str
-    tags: Optional[str]
-    desc: Optional[str]
+    tags: Optional[str] = None
+    desc: Optional[str] = None
     grace: int
     n_pings: int
     status: str
-    last_ping: Optional[datetime]
-    next_ping: Optional[datetime]
+    last_ping: Optional[datetime] = None
+    next_ping: Optional[datetime] = None
     manual_resume: bool
-    methods: Optional[str]
+    methods: Optional[str] = None
     # healthchecks.io's api doesn't return a scheme so we cant use Pydantic AnyUrl here
-    ping_url: Optional[str]
-    update_url: Optional[str]
-    pause_url: Optional[str]
-    channels: Optional[str]
-    timeout: Optional[int]
-    uuid: Optional[str]
+    ping_url: Optional[str] = None
+    update_url: Optional[str] = None
+    pause_url: Optional[str] = None
+    channels: Optional[str] = None
+    timeout: Optional[int] = None
+    uuid: Optional[str] = None
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("uuid", always=True)
     def validate_uuid(cls, value: Optional[str], values: Dict[str, Any]) -> Optional[str]:  # noqa: B902
         """Tries to set the uuid from the ping_url.
@@ -126,28 +128,32 @@ class CheckCreate(BaseModel):
         "for the unique field are name, tags, timeout, and grace.",
     )
 
-    @validator("schedule")
+    @field_validator("schedule")
+    @classmethod
     def validate_schedule(cls, value: str) -> str:
         """Validates that the schedule is a valid cron expression."""
         if not croniter.is_valid(value):
             raise ValueError("Schedule is not a valid cron expression")
         return value
 
-    @validator("tz")
+    @field_validator("tz")
+    @classmethod
     def validate_tz(cls, value: str) -> str:
         """Validates that the timezone is a valid timezone string."""
         if value not in pytz.all_timezones:
             raise ValueError("Tz is not a valid timezone")
         return value
 
-    @validator("methods")
+    @field_validator("methods")
+    @classmethod
     def validate_methods(cls, value: str) -> str:
         """Validate that methods."""
         if value not in ("", "POST"):
             raise ValueError("Methods is invalid, it should be either an empty string or POST")
         return value
 
-    @validator("unique")
+    @field_validator("unique")
+    @classmethod
     def validate_unique(cls, value: List[Optional[str]]) -> List[Optional[str]]:
         """Validate unique list."""
         for unique in value:
