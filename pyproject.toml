@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "healthchecks_io"
-version = "0.4.2"
+version = "0.4.3"
 description = "A python client package for Healthchecks.io API"
 authors = ["Andrew Herrington <andrew.the.techie@gmail.com>"]
 license = "MIT"
