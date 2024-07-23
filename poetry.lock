@@ -1900,13 +1900,13 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "types-croniter"
-version = "2.0.5.20240717"
+version = "2.0.5.20240722"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.5.20240717.tar.gz", hash = "sha256:307eda59874c0369a12623922f9f7558406b6d5b469b9a9eeec5d476bfa46c7e"},
-    {file = "types_croniter-2.0.5.20240717-py3-none-any.whl", hash = "sha256:60296031ca7034f2e9a9987ace2bf8f7cf121d4e69b5e9ac1c8c879f84bce062"},
+    {file = "types-croniter-2.0.5.20240722.tar.gz", hash = "sha256:e95c7092619143a9f94a051242d685f469439042b8404ac34371d2255ef500ec"},
+    {file = "types_croniter-2.0.5.20240722-py3-none-any.whl", hash = "sha256:f6863fb49aafb540a2c54d70ac1f674af00296c16996ac9a8914e4d68efee32b"},
 ]
 
 [[package]]
