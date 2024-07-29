@@ -1900,13 +1900,13 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "types-croniter"
-version = "2.0.5.20240717"
+version = "3.0.0.20240727"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.5.20240717.tar.gz", hash = "sha256:307eda59874c0369a12623922f9f7558406b6d5b469b9a9eeec5d476bfa46c7e"},
-    {file = "types_croniter-2.0.5.20240717-py3-none-any.whl", hash = "sha256:60296031ca7034f2e9a9987ace2bf8f7cf121d4e69b5e9ac1c8c879f84bce062"},
+    {file = "types-croniter-3.0.0.20240727.tar.gz", hash = "sha256:dbdf19b748f91e36f6692c0c847365111bf358815257ce7615b35c2780181951"},
+    {file = "types_croniter-3.0.0.20240727-py3-none-any.whl", hash = "sha256:9d34616d2603c446e101e94416ec53190bf58e96d16a57f4286ac04b08ca401c"},
 ]
 
 [[package]]
@@ -2013,4 +2013,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e1476e50d8b3b0ff15b120b8f9cc078e79dcde5a739c564e61f000ff0f585672"
+content-hash = "4054c9e03a6dde78e6bbfac6e6f6b6b089fab6eb33033591173036d824f6c740"
