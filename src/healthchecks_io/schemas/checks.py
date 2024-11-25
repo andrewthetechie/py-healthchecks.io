@@ -120,10 +120,10 @@ class CheckCreate(BaseModel):
         description="Enables upsert functionality. Before creating a check, "
         "Healthchecks.io looks for existing checks, filtered by fields listed "
         "in unique. If Healthchecks.io does not find a matching check, it "
-        "creates a new check and returns it with the HTTP status code 201 "
+        "creates a new check and returns it with the HTTP status code 201. "
         "If Healthchecks.io finds a matching check, it updates the existing "
         "check and returns it with HTTP status code 200. The accepted values "
-        "for the unique field are name, tags, timeout, and grace.",
+        "for the unique field are name, slug, tags, timeout, and grace.",
     )
 
     @field_validator("schedule")
@@ -155,9 +155,9 @@ class CheckCreate(BaseModel):
     def validate_unique(cls, value: List[Optional[str]]) -> List[Optional[str]]:
         """Validate unique list."""
         for unique in value:
-            if unique not in ("name", "tags", "timeout", "grace"):
+            if unique not in ("name", "slug", "tags", "timeout", "grace"):
                 raise ValueError(
-                    "Unique is not valid. Unique can only be name, tags, timeout, and grace or an empty list"
+                    "Unique is not valid. Unique can only be name, slug, tags, timeout, and grace or an empty list"
                 )
         return value
 
@@ -219,10 +219,10 @@ class CheckUpdate(CheckCreate):
         description="Enables upsert functionality. Before creating a check, "
         "Healthchecks.io looks for existing checks, filtered by fields listed "
         "in unique. If Healthchecks.io does not find a matching check, it "
-        "creates a new check and returns it with the HTTP status code 201 "
+        "creates a new check and returns it with the HTTP status code 201. "
         "If Healthchecks.io finds a matching check, it updates the existing "
         "check and returns it with HTTP status code 200. The accepted values "
-        "for the unique field are name, tags, timeout, and grace.",
+        "for the unique field are name, slug, tags, timeout, and grace.",
     )
 
 
