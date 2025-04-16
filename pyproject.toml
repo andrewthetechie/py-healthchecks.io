@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.rst"
 homepage = "https://github.com/andrewthetechie/py-healthchecks.io"
 repository = "https://github.com/andrewthetechie/py-healthchecks.io"
-documentation = "https://py-healthchecks.io.readthedocs.io"
+documentation = "https://py-healthchecksio.readthedocs.io"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
