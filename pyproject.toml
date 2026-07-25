@@ -33,7 +33,7 @@ pytz = ">=2024.1,<2025.0"
 packaging = "^24.1"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.2.1"
+pytest = ">=7.2.1,<9.0.0"
 coverage = {extras = ["toml"], version = "^7.1"}
 safety = ">=2.3.5,<4.0.0"
 mypy = "^1.0"
