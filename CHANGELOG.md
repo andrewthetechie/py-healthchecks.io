@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.5](https://github.com/andrewthetechie/py-healthchecks.io/compare/v0.4.4...v0.4.5) (2026-07-25)
+
+
+### Documentation
+
+* bump sphinx from 8.1.3 to 9.0.4 in /docs ([#865](https://github.com/andrewthetechie/py-healthchecks.io/issues/865)) ([141fc27](https://github.com/andrewthetechie/py-healthchecks.io/commit/141fc277b47480d86f2444e2f6581fbc15f0f49f))
+
 ## [0.4.4](https://github.com/andrewthetechie/py-healthchecks.io/compare/v0.4.3...v0.4.4) (2025-04-16)
 
 
