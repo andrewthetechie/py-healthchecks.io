@@ -11,6 +11,7 @@ from typing import List
 from typing import Optional
 from typing import Union
 from urllib.parse import urlparse
+import re
 
 import pytz
 from croniter import croniter
@@ -66,6 +67,10 @@ class CheckCreate(BaseModel):
     """Pydantic object for creating a check."""
 
     name: Optional[str] = Field("", description="Name of the check")
+    slug: Optional[str] = Field(
+        "",
+        description="Slug for the check. The slug should only contain the following characters: a-z, 0-9, hyphens, underscores.",
+    )
     tags: Optional[str] = Field("", description="String separated list of tags to apply")
     desc: Optional[str] = Field("", description="Description of the check")
     timeout: Optional[int] = Field(
@@ -126,6 +131,16 @@ class CheckCreate(BaseModel):
         "for the unique field are name, tags, timeout, and grace.",
     )
 
+    @field_validator("slug")
+    @classmethod
+    def validate_slug(cls, value: str) -> str:
+        """Validate that the slug is a valid string."""
+        if not bool(re.match(pattern=r"^[a-z0-9\-_]+$", string=value)):
+            raise ValueError(
+                "Slug is invalid, it must only contain the following characters: a-z, 0-9, hyphens, underscores."
+            )
+        return value
+
     @field_validator("schedule")
     @classmethod
     def validate_schedule(cls, value: str) -> str:
@@ -166,6 +181,10 @@ class CheckUpdate(CheckCreate):
     """Pydantic object for updating a check."""
 
     name: Optional[str] = Field(None, description="Name of the check")
+    slug: Optional[str] = Field(
+        "",
+        description="Slug for the check. The slug should only contain the following characters: a-z, 0-9, hyphens, underscores.",
+    )
     tags: Optional[str] = Field(None, description="String separated list of tags to apply")
     timeout: Optional[int] = Field(
         None,

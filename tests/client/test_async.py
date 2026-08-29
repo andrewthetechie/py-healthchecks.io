@@ -41,7 +41,7 @@ async def test_acreate_check_200_context_manager(fake_check_api_result, respx_mo
         )
     )
     async with test_async_client as test_client:
-        check = await test_client.create_check(CheckCreate(name="test", tags="test", desc="test"))
+        check = await test_client.create_check(CheckCreate(name="test", slug="test", tags="test", desc="test"))
     assert check.name == "Backups"
 
 
@@ -72,7 +72,7 @@ async def test_acreate_check_200(fake_check_api_result, respx_mock, test_async_c
             },
         )
     )
-    check = await test_async_client.create_check(CheckCreate(name="test", tags="test", desc="test"))
+    check = await test_async_client.create_check(CheckCreate(name="test", slug="test", tags="test", desc="test"))
     assert check.name == "Backups"
 
 
@@ -103,7 +103,7 @@ async def test_aupdate_check_200(fake_check_api_result, respx_mock, test_async_c
             },
         )
     )
-    check = await test_async_client.update_check("test", CheckUpdate(name="test", desc="test"))
+    check = await test_async_client.update_check("test", CheckUpdate(name="test", slug="test", desc="test"))
     assert check.name == "Backups"
 
 
